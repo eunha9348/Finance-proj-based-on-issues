@@ -1,0 +1,92 @@
+[
+  {
+    "title": "미국, 중국산 반도체에 추가 관세 발표…무역분쟁 재점화 우려",
+    "link": "https://example.com/news/1",
+    "source": "샘플경제",
+    "summary": "미국 정부가 중국산 반도체에 관세를 부과하면서 무역분쟁 우려가 커지고 있다. 삼성전자 등 반도체 업계 영향이 주목된다.",
+    "published": "2026-07-01T09:00:00",
+    "query": "증시 정치 규제",
+    "market": "KR"
+  },
+  {
+    "title": "중동 지역 공습 재개…유가 급등에 지정학 리스크 부각",
+    "link": "https://example.com/news/2",
+    "source": "샘플국제",
+    "summary": "중동 분쟁 지역에서 공습이 재개되며 유가가 급등했다. 지정학 리스크가 세계 증시 변동성 확대로 이어지고 있다.",
+    "published": "2026-07-02T08:30:00",
+    "query": "전쟁 지정학 리스크 증시",
+    "market": "KR"
+  },
+  {
+    "title": "Fed signals rate cut in September as inflation cools",
+    "link": "https://example.com/news/3",
+    "source": "Sample Finance",
+    "summary": "The Federal Reserve signaled a potential rate cut in September after inflation data cooled, boosting expectations of a soft landing.",
+    "published": "2026-07-02T14:00:00",
+    "query": "Fed interest rate cut FOMC",
+    "market": "US"
+  },
+  {
+    "title": "NVIDIA posts record revenue on AI chip demand, raises guidance",
+    "link": "https://example.com/news/4",
+    "source": "Sample Tech",
+    "summary": "NVIDIA reported record revenue driven by AI semiconductor demand and raised guidance for the next quarter.",
+    "published": "2026-07-03T06:00:00",
+    "query": "NVIDIA stock",
+    "market": "US"
+  },
+  {
+    "title": "Tesla faces short seller pressure after revenue decline in EV segment",
+    "link": "https://example.com/news/5",
+    "source": "Sample Market",
+    "summary": "Tesla shares came under pressure from short sellers after the company reported a revenue decline in its electric vehicle segment.",
+    "published": "2026-07-03T11:00:00",
+    "query": "Tesla stock",
+    "market": "US"
+  },
+  {
+    "title": "코스피 외국인 순매도 지속…투자심리 위축에 급락",
+    "link": "https://example.com/news/6",
+    "source": "샘플증권",
+    "summary": "외국인 순매도가 이어지며 코스피가 급락했다. 공포지수가 오르며 투자심리가 위축되고 변동성 확대가 우려된다.",
+    "published": "2026-07-03T15:30:00",
+    "query": "코스피 투자심리 급락 급등",
+    "market": "KR"
+  },
+  {
+    "title": "삼성전자, HBM 대규모 수주 공시…반도체 업황 회복 기대",
+    "link": "https://example.com/news/7",
+    "source": "샘플IT",
+    "summary": "삼성전자가 HBM 메모리 대규모 계약 수주를 공시했다. 반도체 업황 회복과 실적 호조 기대감이 커지고 있다.",
+    "published": "2026-07-04T09:00:00",
+    "query": "삼성전자 주가",
+    "market": "KR"
+  },
+  {
+    "title": "한화에어로스페이스, 유럽 방산 수출 대규모 계약 체결",
+    "link": "https://example.com/news/8",
+    "source": "샘플산업",
+    "summary": "한화에어로스페이스가 유럽에 방산 수출 대규모 계약을 체결했다. 지정학 불안 속 방위산업 수주 확대가 이어지고 있다.",
+    "published": "2026-07-04T10:00:00",
+    "query": "한화에어로스페이스 주가",
+    "market": "KR"
+  },
+  {
+    "title": "Apple hit with antitrust lawsuit over App Store practices",
+    "link": "https://example.com/news/9",
+    "source": "Sample Legal",
+    "summary": "Apple faces a new antitrust lawsuit over its App Store practices, adding regulation risk for the big tech sector.",
+    "published": "2026-07-04T12:00:00",
+    "query": "Apple stock",
+    "market": "US"
+  },
+  {
+    "title": "LG에너지솔루션, 배터리 판가 하락에 실적 부진…매출 감소",
+    "link": "https://example.com/news/10",
+    "source": "샘플배터리",
+    "summary": "LG에너지솔루션이 전기차 수요 둔화와 배터리 판가 하락으로 매출 감소와 실적 부진을 기록했다.",
+    "published": "2026-07-04T13:00:00",
+    "query": "LG에너지솔루션 주가",
+    "market": "KR"
+  }
+]

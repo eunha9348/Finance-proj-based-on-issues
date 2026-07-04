@@ -1,0 +1,11 @@
+{
+  "owner": "example_user",
+  "holdings": [
+    {"ticker": "005930.KS", "name": "삼성전자", "market": "KR", "quantity": 50, "avg_price": 72000, "sector": "semiconductor"},
+    {"ticker": "373220.KS", "name": "LG에너지솔루션", "market": "KR", "quantity": 5, "avg_price": 410000, "sector": "ev_battery"},
+    {"ticker": "012450.KS", "name": "한화에어로스페이스", "market": "KR", "quantity": 10, "avg_price": 250000, "sector": "defense"},
+    {"ticker": "AAPL", "name": "Apple", "market": "US", "quantity": 15, "avg_price": 185.5, "sector": "bigtech"},
+    {"ticker": "NVDA", "name": "NVIDIA", "market": "US", "quantity": 8, "avg_price": 120.0, "sector": "semiconductor"},
+    {"ticker": "TSLA", "name": "Tesla", "market": "US", "quantity": 12, "avg_price": 230.0, "sector": "ev_battery"}
+  ]
+}

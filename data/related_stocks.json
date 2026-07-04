@@ -1,0 +1,79 @@
+{
+  "_comment": "섹터별 연관 종목 매핑. 같은 섹터의 이슈는 correlation 비율만큼 연관 종목에 전이된다.",
+  "sectors": {
+    "semiconductor": {
+      "label_ko": "반도체",
+      "correlation": 0.7,
+      "tickers": ["005930.KS", "000660.KS", "NVDA", "AMD", "INTC", "TSM", "MU", "AVGO"],
+      "keywords": ["반도체", "메모리", "HBM", "파운드리", "semiconductor", "chip", "foundry", "memory"]
+    },
+    "bigtech": {
+      "label_ko": "빅테크·플랫폼",
+      "correlation": 0.6,
+      "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "035420.KS", "035720.KS"],
+      "keywords": ["빅테크", "플랫폼", "big tech", "cloud", "클라우드", "AI", "인공지능"]
+    },
+    "ev_battery": {
+      "label_ko": "전기차·2차전지",
+      "correlation": 0.7,
+      "tickers": ["TSLA", "373220.KS", "051910.KS", "006400.KS", "247540.KQ", "RIVN"],
+      "keywords": ["전기차", "2차전지", "배터리", "양극재", "EV", "battery", "electric vehicle"]
+    },
+    "auto": {
+      "label_ko": "자동차",
+      "correlation": 0.6,
+      "tickers": ["005380.KS", "000270.KS", "F", "GM", "TSLA"],
+      "keywords": ["자동차", "완성차", "automaker", "car sales"]
+    },
+    "bio_pharma": {
+      "label_ko": "바이오·제약",
+      "correlation": 0.5,
+      "tickers": ["207940.KS", "068270.KS", "PFE", "MRNA", "LLY", "JNJ"],
+      "keywords": ["바이오", "제약", "신약", "임상", "FDA", "pharma", "biotech", "clinical trial"]
+    },
+    "finance": {
+      "label_ko": "금융·은행",
+      "correlation": 0.6,
+      "tickers": ["105560.KS", "055550.KS", "086790.KS", "JPM", "BAC", "GS"],
+      "keywords": ["은행", "금융지주", "증권사", "bank", "brokerage", "financial"]
+    },
+    "defense": {
+      "label_ko": "방산",
+      "correlation": 0.6,
+      "tickers": ["012450.KS", "047810.KS", "079550.KS", "LMT", "RTX", "NOC"],
+      "keywords": ["방산", "방위산업", "무기", "defense", "weapons", "military"]
+    },
+    "energy_oil": {
+      "label_ko": "에너지·정유",
+      "correlation": 0.6,
+      "tickers": ["096770.KS", "010950.KS", "XOM", "CVX", "OXY"],
+      "keywords": ["정유", "유가", "원유", "oil", "crude", "energy"]
+    },
+    "shipbuilding": {
+      "label_ko": "조선",
+      "correlation": 0.6,
+      "tickers": ["329180.KS", "009540.KS", "042660.KS"],
+      "keywords": ["조선", "선박", "수주", "shipbuilding"]
+    },
+    "retail_consumer": {
+      "label_ko": "유통·소비재",
+      "correlation": 0.5,
+      "tickers": ["WMT", "COST", "NKE", "SBUX", "023530.KS", "282330.KS"],
+      "keywords": ["유통", "소비재", "소비 심리", "retail", "consumer spending"]
+    },
+    "entertainment": {
+      "label_ko": "엔터·콘텐츠",
+      "correlation": 0.5,
+      "tickers": ["352820.KS", "035900.KQ", "122870.KQ", "NFLX", "DIS"],
+      "keywords": ["엔터", "케이팝", "콘텐츠", "K-pop", "streaming", "entertainment"]
+    }
+  },
+  "_axis_market_beta_comment": "종목이 직접 언급되지 않은 시장 전반 이슈가 개별 종목에 전이되는 비율(시장 베타 근사)",
+  "axis_market_beta": {
+    "geopolitics": 0.5,
+    "war_global": 0.6,
+    "company": 0.15,
+    "sentiment": 0.7,
+    "macro_finance": 0.8
+  }
+}
