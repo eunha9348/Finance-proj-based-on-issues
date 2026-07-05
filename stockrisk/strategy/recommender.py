@@ -60,9 +60,18 @@ PROFIT_TACTICS = {
 }
 
 
-def _score_to_action(score: float) -> Action:
+# 투자 성향별 임계값 보정: 보수적일수록 매수는 어렵고 매도는 빨라진다
+PROFILE_SHIFTS = {
+    "conservative": -0.10,   # 안정형: 점수를 낮춰 판정 (매수 문턱↑, 매도 문턱↓)
+    "balanced": 0.0,         # 위험중립형
+    "aggressive": +0.10,     # 공격형: 점수를 높여 판정
+}
+
+
+def _score_to_action(score: float, shift: float = 0.0) -> Action:
+    effective = score + shift
     for threshold, action in THRESHOLDS:
-        if score >= threshold:
+        if effective >= threshold:
             return action
     return Action.SELL
 
@@ -78,11 +87,16 @@ def _dominant_axes(impact: HoldingImpact, k: int = 2) -> list[tuple[IssueAxis, f
 
 
 class StrategyRecommender:
+    def __init__(self, risk_profile: str = "balanced"):
+        """risk_profile: conservative(안정형) / balanced(위험중립형) / aggressive(공격형)"""
+        self.risk_profile = risk_profile
+        self.shift = PROFILE_SHIFTS.get(risk_profile, 0.0)
+
     def recommend(self, impact: HoldingImpact) -> list[Recommendation]:
         recs = []
         for horizon in Horizon:
             score = impact.horizon_scores.get(horizon, 0.0)
-            action = _score_to_action(score)
+            action = _score_to_action(score, self.shift)
             rationale = self._build_rationale(impact, horizon, score, action)
 
             risk = list(RISK_TACTICS[horizon]) if score < 0 else []

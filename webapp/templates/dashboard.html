@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}대시보드 — IssueLens{% endblock %}
+{% block content %}
+<h2>{{ g.user['name'] }}님의 대시보드</h2>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>🧭 나의 투자 성향</h3>
+    {% if profile %}
+      <p class="risk-badge {{ profile['risk_type'] }}">{{ risk_labels[profile['risk_type']] }}</p>
+      <p class="muted">{{ risk_desc[profile['risk_type']] }}</p>
+      <a class="btn btn-ghost" href="{{ url_for('survey.survey') }}">다시 진단하기</a>
+    {% else %}
+      <p class="muted">아직 진단 전입니다. 진단 후 맞춤 추천 기준이 적용됩니다.</p>
+      <a class="btn btn-primary" href="{{ url_for('survey.survey') }}">투자 성향 진단하기</a>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>💼 내 포트폴리오 ({{ holdings|length }}종목)</h3>
+    {% if holdings %}
+      <ul class="mini-list">
+        {% for h in holdings[:5] %}
+          <li><b>{{ h['name'] }}</b> <span class="muted">{{ h['ticker'] }} · {{ h['market'] }}</span></li>
+        {% endfor %}
+        {% if holdings|length > 5 %}<li class="muted">외 {{ holdings|length - 5 }}종목…</li>{% endif %}
+      </ul>
+      <div class="btn-row">
+        <form method="post" action="{{ url_for('main.analyze_portfolio') }}">
+          <button class="btn btn-primary" type="submit">포트폴리오 전체 분석</button>
+        </form>
+        <a class="btn btn-ghost" href="{{ url_for('main.portfolio') }}">종목 관리</a>
+      </div>
+    {% else %}
+      <p class="muted">보유 종목을 등록하면 포트폴리오 종합 분석을 받을 수 있습니다.</p>
+      <a class="btn btn-primary" href="{{ url_for('main.portfolio') }}">종목 추가하기</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h3>🕐 최근 분석</h3>
+  {% if recent %}
+    <table class="table">
+      <thead><tr><th>일시(UTC)</th><th>대상</th><th>뉴스</th><th>이슈</th><th>모드</th><th></th></tr></thead>
+      <tbody>
+      {% for a in recent %}
+        <tr>
+          <td>{{ a['created_at'] }}</td>
+          <td>{{ '포트폴리오 전체' if a['kind'] == 'portfolio' else a['target'] }}</td>
+          <td>{{ a['news_count'] }}건</td>
+          <td>{{ a['issue_count'] }}건</td>
+          <td>{{ '샘플' if a['offline'] else '실시간' }}</td>
+          <td><a href="{{ url_for('main.history_detail', analysis_id=a['id']) }}">보기</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">아직 분석 이력이 없습니다. <a href="{{ url_for('main.analyze') }}">첫 분석을 시작해 보세요.</a></p>
+  {% endif %}
+</div>
+{% endblock %}

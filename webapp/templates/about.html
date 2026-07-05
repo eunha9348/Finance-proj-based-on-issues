@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}서비스 소개 — IssueLens{% endblock %}
+{% block content %}
+<h2>IssueLens는 어떻게 동작하나요?</h2>
+
+<div class="card">
+  <h3>1. 다섯 개의 이슈 축</h3>
+  <p>시장을 움직이는 뉴스를 다섯 갈래로 나눠 스캔합니다.</p>
+  <table class="table">
+    <thead><tr><th>축</th><th>내용</th><th>예시</th></tr></thead>
+    <tbody>
+      <tr><td>① 국가별 정치</td><td>선거·규제·관세·제재</td><td>반도체 관세, 반독점 소송</td></tr>
+      <tr><td>② 전쟁·세계</td><td>전쟁·분쟁·팬데믹·재해</td><td>중동 공습, 휴전 협상</td></tr>
+      <tr><td>③ 기업 자체</td><td>오너리스크·실적·공매도</td><td>어닝쇼크, 대규모 수주</td></tr>
+      <tr><td>④ 투자심리</td><td>급등락·수급·공포지수</td><td>외국인 순매도, 패닉셀</td></tr>
+      <tr><td>⑤ 거시 금융</td><td>금리·물가·환율</td><td>연준 금리인하, 경기침체</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>2. 점수는 이렇게 계산됩니다</h3>
+  <ol>
+    <li><b>이슈 분류</b> — 뉴스에서 축별 키워드를 찾아 심각도(0~1)와 방향성(-1~+1)을 산출</li>
+    <li><b>관련도 판정</b> — 종목 직접 언급(100%) → 같은 섹터(상관계수) → 시장 전반(베타) 순서로 전이</li>
+    <li><b>기여 합산</b> — 방향성 × 심각도 × 관련도를 축별로 평균, 뉴스 건수로 신뢰도 보정</li>
+    <li><b>기간 합성</b> — 단기는 심리·전쟁, 장기는 기업·금리에 가중해 3개 기간 점수 산출</li>
+    <li><b>성향 보정</b> — 투자 성향 진단 결과에 따라 매수·매도 임계값을 ±0.10 이동</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>3. 추천 기준</h3>
+  <table class="table">
+    <thead><tr><th>기간 점수</th><th>판정</th></tr></thead>
+    <tbody>
+      <tr><td>+0.45 이상</td><td>적극 매수</td></tr>
+      <tr><td>+0.15 이상</td><td>매수</td></tr>
+      <tr><td>-0.15 초과</td><td>보유</td></tr>
+      <tr><td>-0.45 초과</td><td>비중 축소</td></tr>
+      <tr><td>그 이하</td><td>매도</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">안정형은 기준이 0.10 엄격해지고, 공격형은 0.10 완화됩니다.</p>
+</div>
+
+<div class="card disclaimer">
+  ⚠️ IssueLens는 뉴스 텍스트 기반 규칙 분석 도구입니다. 가격·재무 데이터를 직접 반영하지 않으며,
+  출력은 투자 권유가 아닌 참고 자료입니다.
+</div>
+{% endblock %}

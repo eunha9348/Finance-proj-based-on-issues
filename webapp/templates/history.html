@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}분석 이력 — IssueLens{% endblock %}
+{% block content %}
+<h2>🕐 분석 이력</h2>
+<div class="card">
+  {% if analyses %}
+    <table class="table">
+      <thead><tr><th>일시(UTC)</th><th>구분</th><th>대상</th><th>뉴스</th><th>이슈</th><th>모드</th><th></th></tr></thead>
+      <tbody>
+      {% for a in analyses %}
+        <tr>
+          <td>{{ a['created_at'] }}</td>
+          <td>{{ '포트폴리오' if a['kind'] == 'portfolio' else '단일 종목' }}</td>
+          <td>{{ a['target'] }}</td>
+          <td>{{ a['news_count'] }}</td>
+          <td>{{ a['issue_count'] }}</td>
+          <td>{{ '샘플' if a['offline'] else '실시간' }}</td>
+          <td><a href="{{ url_for('main.history_detail', analysis_id=a['id']) }}">리포트 보기</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">분석 이력이 없습니다.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">뉴스가 움직이는 시장, 근거 있는 판단</p>
+    <h1>5대 이슈 축으로 읽는<br>내 포트폴리오 리스크</h1>
+    <p class="lead">
+      정치 · 전쟁 · 기업 · 투자심리 · 금리. IssueLens는 미국·한국 증시 뉴스를
+      다섯 개의 축으로 분류해 보유 종목과 연관 종목에 미치는 영향을 점수화하고,
+      단기·중기·장기 전략과 매수/매도 의견을 근거와 함께 제시합니다.
+    </p>
+    <div class="hero-cta">
+      {% if g.user %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.analyze') }}">종목 분석하기</a>
+        <a class="btn btn-ghost btn-lg" href="{{ url_for('main.dashboard') }}">내 대시보드</a>
+      {% else %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">무료로 시작하기</a>
+        <a class="btn btn-ghost btn-lg" href="{{ url_for('main.about') }}">어떻게 동작하나요?</a>
+      {% endif %}
+    </div>
+    <p class="hero-note">가입 시 6문항 투자 성향 진단으로 나에게 맞는 추천 기준이 적용됩니다.</p>
+  </div>
+  <div class="hero-card card">
+    <h3>📊 오늘의 분석 흐름</h3>
+    <ol class="steps">
+      <li><b>뉴스 수집</b> — 한국·미국 시장 뉴스 자동 스크래핑</li>
+      <li><b>이슈 분류</b> — 5대 축, 심각도 × 방향성 산출</li>
+      <li><b>영향 분석</b> — 직접 언급 → 섹터 → 시장 3단계 전이</li>
+      <li><b>전략 제시</b> — 기간별 매수/매도 + 리스크 관리 전술</li>
+    </ol>
+  </div>
+</section>
+
+<section class="grid-3">
+  <div class="card">
+    <div class="card-icon">🌐</div>
+    <h3>다섯 개의 렌즈</h3>
+    <p>국가별 정치, 전쟁·세계 이슈, 기업 자체 이슈(오너리스크·매출·공매도),
+       시장 투자심리, 거시 금융(금리·환율)을 동시에 스캔해 확증편향을 줄입니다.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">🧭</div>
+    <h3>성향 맞춤 추천</h3>
+    <p>안정형·위험중립형·공격형 진단에 따라 매수·매도 임계값이 자동 보정됩니다.
+       같은 뉴스라도 나의 위험 감내 수준에 맞는 다른 판단을 제안합니다.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">🧾</div>
+    <h3>근거 있는 리포트</h3>
+    <p>모든 점수에는 근거 뉴스와 전이 경로가 붙습니다. 왜 이 추천이 나왔는지
+       한 줄까지 추적할 수 있는 화이트박스 분석입니다.</p>
+  </div>
+</section>
+{% endblock %}

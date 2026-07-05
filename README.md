@@ -1,10 +1,42 @@
-# 📊 Finance Proj Based on Issues — 이슈 기반 포트폴리오 리스크 분석·추천 시스템
+# 📊 IssueLens — 이슈 기반 포트폴리오 리스크 분석·추천 웹서비스
 
 사용자 포트폴리오(미국·한국 증시)를 입력하면 **5대 이슈 축**으로 뉴스를 수집·분류하고,
 보유 종목과 연관 종목에 미치는 영향을 분석해 **단기/중기/장기** 리스크 관리·수익 극대화
 전략과 **매수/매도/보유** 추천을 리포트로 생성합니다.
 
+분석 엔진(`stockrisk`, CLI)과 웹서비스(`webapp`, Flask) 두 층으로 구성됩니다.
+
 > ⚠️ 본 시스템의 출력은 참고 자료이며 투자 권유가 아닙니다. 투자 판단과 책임은 본인에게 있습니다.
+
+## 🌐 웹서비스 (IssueLens)
+
+```bash
+pip install -r requirements.txt
+python run.py                 # http://127.0.0.1:5000 (개발 서버)
+# 운영 배포 예시
+FLASK_SECRET_KEY=$(python -c "import secrets;print(secrets.token_hex(32))") \
+  gunicorn -w 2 -b 0.0.0.0:8000 "webapp:create_app()"
+```
+
+- **데모 계정**: `demo@example.com` / `demo1234`
+- **회원가입·로그인**: 이메일 가입(PBKDF2 해시) + 소셜 연동(Google/카카오/네이버 OAuth2).
+  소셜 로그인은 환경변수 설정 시 자동 활성화:
+  `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET`,
+  `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`
+  (콜백 URL: `/auth/social/callback`)
+- **투자 성향 설문**: 가입 직후 6문항 진단 → 안정형/위험중립형/공격형.
+  성향에 따라 매수·매도 임계값이 ±0.10 보정됩니다.
+- **종목 분석**: 레지스트리(`data/tickers.json`, 60여 종목) 검색 +
+  목록에 없는 종목도 이름·시장 입력으로 분석 가능. 실시간 뉴스 수집 실패 시
+  샘플 뉴스로 자동 폴백해 항상 결과를 반환합니다.
+- **포트폴리오 관리 / 분석 이력**: 종목 등록·수정·삭제, 전체 분석, 리포트 이력 저장.
+
+### 데이터베이스
+
+- 스키마: [`db/schema.sql`](db/schema.sql) (users, risk_profiles, holdings, analyses)
+- 시드 DB: [`db/app.db`](db/app.db) — 데모 계정·포트폴리오 포함, 저장소에 커밋됨
+- 런타임 DB: `instance/app.db` (첫 실행 시 시드 DB를 복사; `WEBAPP_DB` 환경변수로 변경 가능)
+- 시드 재생성: `python scripts/init_db.py`
 
 ## 5대 이슈 축
 

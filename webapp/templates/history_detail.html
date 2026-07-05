@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}리포트 #{{ analysis['id'] }} — IssueLens{% endblock %}
+{% block content %}
+<h2>리포트 #{{ analysis['id'] }} <span class="muted">{{ analysis['created_at'] }} (UTC)</span></h2>
+<p class="muted">
+  대상: {{ analysis['target'] }} ·
+  뉴스 {{ analysis['news_count'] }}건 · 이슈 {{ analysis['issue_count'] }}건 ·
+  {{ '샘플 뉴스 모드' if analysis['offline'] else '실시간 뉴스' }}
+</p>
+<div class="card">
+  <pre class="report-md">{{ analysis['report_md'] }}</pre>
+</div>
+<a class="btn btn-ghost" href="{{ url_for('main.history') }}">← 이력 목록으로</a>
+{% endblock %}

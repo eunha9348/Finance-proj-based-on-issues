@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}포트폴리오 — IssueLens{% endblock %}
+{% block content %}
+<h2>💼 내 포트폴리오</h2>
+
+<div class="card">
+  <h3>종목 추가</h3>
+  <form method="post" class="form" autocomplete="off">
+    <div class="form-row">
+      <label>종목명 또는 티커
+        <input type="text" name="query" required placeholder="예: 삼성전자, AAPL" list="ticker-list">
+        <datalist id="ticker-list">
+          {% for t in registry %}
+            <option value="{{ t['name'] }}">{{ t['ticker'] }} ({{ t['market'] }})</option>
+          {% endfor %}
+        </datalist>
+      </label>
+      <label>시장 <span class="muted">(목록에 없을 때)</span>
+        <select name="market">
+          <option value="">자동</option>
+          <option value="KR">한국</option>
+          <option value="US">미국</option>
+        </select>
+      </label>
+    </div>
+    <div class="form-row">
+      <label>보유 수량 <input type="number" name="quantity" step="any" min="0" placeholder="0"></label>
+      <label>평균 매수가 <input type="number" name="avg_price" step="any" min="0" placeholder="0"></label>
+    </div>
+    <button class="btn btn-primary" type="submit">추가 / 수정</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>보유 종목 ({{ holdings|length }})</h3>
+  {% if holdings %}
+    <table class="table">
+      <thead><tr><th>종목</th><th>티커</th><th>시장</th><th>수량</th><th>평균단가</th><th></th></tr></thead>
+      <tbody>
+      {% for h in holdings %}
+        <tr>
+          <td><b>{{ h['name'] }}</b></td>
+          <td>{{ h['ticker'] }}</td>
+          <td>{{ h['market'] }}</td>
+          <td>{{ '%g' % h['quantity'] }}</td>
+          <td>{{ '{:,.2f}'.format(h['avg_price']) }}</td>
+          <td>
+            <form method="post" action="{{ url_for('main.portfolio_delete', holding_id=h['id']) }}"
+                  onsubmit="return confirm('{{ h['name'] }} 종목을 삭제할까요?')">
+              <button class="btn btn-ghost small-btn" type="submit">삭제</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <form method="post" action="{{ url_for('main.analyze_portfolio') }}">
+      <button class="btn btn-primary btn-lg" type="submit">포트폴리오 전체 분석 실행</button>
+    </form>
+  {% else %}
+    <p class="muted">아직 등록된 종목이 없습니다.</p>
+  {% endif %}
+</div>
+{% endblock %}
