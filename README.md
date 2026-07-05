@@ -38,6 +38,30 @@ FLASK_SECRET_KEY=$(python -c "import secrets;print(secrets.token_hex(32))") \
 - 런타임 DB: `instance/app.db` (첫 실행 시 시드 DB를 복사; `WEBAPP_DB` 환경변수로 변경 가능)
 - 시드 재생성: `python scripts/init_db.py`
 
+### 무료 호스팅 배포 (Render / Railway)
+
+두 플랫폼 모두 이 저장소를 그대로 인식하도록 배포 설정 파일을 포함하고 있습니다.
+
+**Render (무료 웹서비스)**
+
+1. https://dashboard.render.com → **New +** → **Blueprint**
+2. 이 GitHub 저장소(`eunha9348/Finance-proj-based-on-issues`) 연결 → `render.yaml`을 자동 인식
+3. `FLASK_SECRET_KEY`는 자동 생성됩니다. 소셜 로그인을 쓰려면 대시보드에서
+   `GOOGLE_CLIENT_ID` 등 값을 채워 넣으세요 (선택 사항, 비워두면 비활성화 상태로 정상 동작)
+4. Deploy 클릭 → 빌드 완료 후 `https://issuelens.onrender.com` 형태의 URL 발급
+
+**Railway**
+
+1. https://railway.app → **New Project** → **Deploy from GitHub repo**
+2. 이 저장소 선택 → `railway.json` + `Procfile`을 자동 인식(Nixpacks 빌더)
+3. **Variables** 탭에서 `FLASK_SECRET_KEY` 추가 (필수), 소셜 로그인 키는 선택
+4. Deploy 후 **Settings → Networking → Generate Domain**으로 공개 URL 발급
+
+> ⚠️ **무료 티어 디스크는 영구 저장이 보장되지 않습니다.** 재배포·재시작 시
+> `instance/app.db`가 초기화될 수 있어 신규 가입 계정·포트폴리오가 사라질 수 있습니다.
+> 데모 이상의 용도로 데이터를 영구 보존하려면 Render Postgres, Railway Postgres
+> 플러그인 등 외부 DB 연결을 권장합니다. (schema.sql은 표준 SQL이라 이식이 쉽습니다.)
+
 ## 5대 이슈 축
 
 | 축 | 내용 | 예시 |
