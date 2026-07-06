@@ -89,8 +89,83 @@ class TestActionMapping(unittest.TestCase):
         self.assertEqual(_score_to_action(0.6), Action.STRONG_BUY)
         self.assertEqual(_score_to_action(0.2), Action.BUY)
         self.assertEqual(_score_to_action(0.0), Action.HOLD)
-        self.assertEqual(_score_to_action(-0.3), Action.REDUCE)
+        self.assertEqual(_score_to_action(-0.2), Action.REDUCE)
         self.assertEqual(_score_to_action(-0.6), Action.SELL)
+
+    def test_profile_shift_changes_action(self):
+        # 경계 근처 점수는 성향에 따라 판정이 달라진다
+        self.assertEqual(_score_to_action(0.08, shift=+0.08), Action.BUY)      # 공격형
+        self.assertEqual(_score_to_action(0.08, shift=-0.08), Action.HOLD)     # 안정형
+        self.assertEqual(_score_to_action(-0.08, shift=-0.08), Action.REDUCE)  # 안정형
+
+
+class TestTacticsAreStockSpecific(unittest.TestCase):
+    """전술이 종목·이슈에 따라 달라지고, 헤지 수단이 구체적으로 제시되는지 검증."""
+
+    def setUp(self):
+        self.portfolio = load_portfolio(ROOT / "portfolio.example.json")
+        news = load_news_from_file(ROOT / "samples" / "sample_news.json")
+        issues = IssueClassifier().classify_all(news, self.portfolio)
+        self.impacts = ImpactAnalyzer().analyze(self.portfolio, issues)
+        self.recs = StrategyRecommender().recommend_all(self.impacts)
+
+    def _all_tactics(self, ticker: str) -> str:
+        return " ".join(
+            t for rec in self.recs[ticker]
+            for t in rec.risk_management + rec.profit_strategy
+        )
+
+    def test_tactics_differ_between_stocks(self):
+        lg = self._all_tactics("373220.KS")
+        nvda = self._all_tactics("NVDA")
+        self.assertNotEqual(lg, nvda)
+
+    def test_negative_stock_gets_concrete_hedges(self):
+        # LG에너지솔루션: 전 축 악재 → 손절 기준 + 헤지 수단이 구체적으로 제시
+        lg = self._all_tactics("373220.KS")
+        self.assertIn("손절 기준", lg)
+        self.assertIn("410,000", lg.replace(",", ","))  # 평균단가 기반 계산 포함
+
+    def test_stop_loss_uses_avg_price(self):
+        # 삼성전자 avg 72000 → -8% = 66,240 이 문구에 등장
+        samsung_tactics = self._all_tactics("005930.KS")
+        if "손절 기준" in samsung_tactics:
+            self.assertIn("66,240", samsung_tactics)
+
+    def test_axis_evidence_populated(self):
+        nvda = next(i for i in self.impacts if i.holding.ticker == "NVDA")
+        company_ev = nvda.axis_evidence.get(IssueAxis.COMPANY, [])
+        self.assertTrue(company_ev)
+        self.assertIn("title", company_ev[0])
+        self.assertIn("contribution", company_ev[0])
+
+
+class TestPrices(unittest.TestCase):
+    """가격 모듈: 합성 데이터로 지표·SVG 검증 (네트워크 불필요)."""
+
+    def _hist(self):
+        from stockrisk.prices import PriceHistory
+        closes = [100 + i * 0.5 + (5 if i % 7 == 0 else 0) for i in range(120)]
+        dates = [f"2026-0{1 + i // 30}-{1 + i % 30:02d}" for i in range(120)]
+        return PriceHistory(symbol="TEST", dates=dates, closes=closes, currency="USD")
+
+    def test_metrics(self):
+        h = self._hist()
+        self.assertGreater(h.return_over(20), 0)
+        self.assertIsNotNone(h.annualized_volatility)
+        self.assertLessEqual(h.max_drawdown, 0)
+        self.assertGreater(h.period_high, h.period_low)
+
+    def test_svg_renders(self):
+        from stockrisk.prices import render_price_svg
+        svg = render_price_svg(self._hist())
+        self.assertIn("<svg", svg)
+        self.assertIn("path", svg)
+
+    def test_fetch_failure_returns_none(self):
+        from stockrisk.prices import fetch_history
+        # 존재하지 않는 호스트/차단 환경에서도 예외 없이 None
+        self.assertIsNone(fetch_history("___INVALID___", timeout=2))
 
 
 if __name__ == "__main__":

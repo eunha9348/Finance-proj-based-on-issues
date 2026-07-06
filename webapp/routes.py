@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from flask import (
-    Blueprint, flash, g, jsonify, redirect, render_template, request, url_for,
+    Blueprint, current_app, flash, g, jsonify, redirect, render_template,
+    request, url_for,
 )
 
 from stockrisk.models import Holding, Market
@@ -101,7 +102,11 @@ def analyze():
                 "analyze.html", registry=ticker_registry(),
                 unresolved=query,
             )
-        result = run_analysis([holding], risk_profile=_user_risk_profile())
+        result = run_analysis(
+            [holding],
+            risk_profile=_user_risk_profile(),
+            fetch_prices=not current_app.config.get("TESTING", False),
+        )
         analysis_id = _save_analysis("single", holding.ticker, result)
         return render_template(
             "report.html",
@@ -121,7 +126,11 @@ def analyze_portfolio():
     if not holdings:
         flash("먼저 포트폴리오에 종목을 추가해 주세요.")
         return redirect(url_for("main.portfolio"))
-    result = run_analysis(holdings, risk_profile=_user_risk_profile())
+    result = run_analysis(
+        holdings,
+        risk_profile=_user_risk_profile(),
+        fetch_prices=not current_app.config.get("TESTING", False),
+    )
     analysis_id = _save_analysis("portfolio", "portfolio", result)
     return render_template(
         "report.html", result=result, analysis_id=analysis_id,

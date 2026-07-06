@@ -86,36 +86,51 @@ class ImpactAnalyzer:
         return 0.0, ""
 
     def _analyze_holding(self, holding: Holding, issues: list[ClassifiedIssue]) -> HoldingImpact:
-        axis_acc: dict[IssueAxis, list[float]] = {a: [] for a in IssueAxis}
+        # 축별 (기여, 관련도) 누적
+        axis_acc: dict[IssueAxis, list[tuple[float, float]]] = {a: [] for a in IssueAxis}
         scored: list[tuple[float, ClassifiedIssue, str]] = []
 
+        axis_evidence: dict = {a: [] for a in IssueAxis}
         for issue in issues:
             relevance, path = self._relevance(holding, issue)
             if relevance <= 0.0:
                 continue
             # 이슈 1건의 기여 = 방향성 × 심각도 × 관련도
             contribution = issue.sentiment * issue.severity * relevance
-            axis_acc[issue.axis].append(contribution)
+            axis_acc[issue.axis].append((contribution, relevance))
             scored.append((abs(contribution), issue, path))
+            axis_evidence[issue.axis].append({
+                "title": issue.news.title,
+                "link": issue.news.link,
+                "contribution": round(contribution, 3),
+                "path": path,
+            })
 
-        # 축별 점수: 기여 평균에 이슈 수 보정(같은 방향 뉴스가 많을수록 신뢰도↑)
+        # 축별 점수: 관련도 가중 평균 — 직접 언급 뉴스가 시장 전반 노이즈에
+        # 희석되지 않도록 관련도가 높은 이슈에 더 큰 발언권을 준다.
         axis_scores: dict[IssueAxis, float] = {}
         for axis, vals in axis_acc.items():
             if not vals:
                 axis_scores[axis] = 0.0
                 continue
-            mean = sum(vals) / len(vals)
-            volume_boost = min(1.0, 0.6 + 0.1 * len(vals))  # 1건 0.7배 ~ 4건 이상 1.0배
-            axis_scores[axis] = round(max(-1.0, min(1.0, mean * volume_boost)), 3)
+            w_sum = sum(rel for _, rel in vals)
+            weighted_mean = sum(c * rel for c, rel in vals) / w_sum
+            # 근거 보정: 관련도 합(유효 뉴스량)이 클수록 신뢰도↑ (0.7배 ~ 1.0배)
+            evidence = min(1.0, 0.7 + 0.12 * w_sum)
+            axis_scores[axis] = round(max(-1.0, min(1.0, weighted_mean * evidence)), 3)
 
-        # 기간별 합성 점수
+        # 기간별 합성: 축 가중치에 |축 점수|(현저성)를 곱해, 신호가 뚜렷한 축이
+        # 0에 가까운 축들에 희석되지 않도록 한다.
         horizon_scores: dict[Horizon, float] = {}
         for horizon in Horizon:
             num, den = 0.0, 0.0
             for axis in IssueAxis:
-                w = self.horizon_weights[axis.value][horizon.value]
-                num += axis_scores[axis] * w
-                den += w if axis_scores[axis] != 0.0 else 0.0
+                s = axis_scores[axis]
+                if s == 0.0:
+                    continue
+                w = self.horizon_weights[axis.value][horizon.value] * (0.25 + abs(s))
+                num += s * w
+                den += w
             horizon_scores[horizon] = round(num / den, 3) if den > 0 else 0.0
 
         # 근거 이슈 상위 5건
@@ -126,10 +141,16 @@ class ImpactAnalyzer:
             for _, iss, path in scored[:5]
         ]
 
+        # 축별 근거를 기여 절대값 순으로 정렬 (상위 4건씩)
+        for axis in axis_evidence:
+            axis_evidence[axis].sort(key=lambda e: abs(e["contribution"]), reverse=True)
+            axis_evidence[axis] = axis_evidence[axis][:4]
+
         return HoldingImpact(
             holding=holding,
             axis_scores=axis_scores,
             horizon_scores=horizon_scores,
             top_issues=top_issues,
             related_notes=related_notes,
+            axis_evidence=axis_evidence,
         )

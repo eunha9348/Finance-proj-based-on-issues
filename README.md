@@ -25,7 +25,7 @@ FLASK_SECRET_KEY=$(python -c "import secrets;print(secrets.token_hex(32))") \
   `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`
   (콜백 URL: `/auth/social/callback`)
 - **투자 성향 설문**: 가입 직후 6문항 진단 → 안정형/위험중립형/공격형.
-  성향에 따라 매수·매도 임계값이 ±0.10 보정됩니다.
+  성향에 따라 매수·매도 임계값이 ±0.08 보정됩니다.
 - **종목 분석**: 레지스트리(`data/tickers.json`, 60여 종목) 검색 +
   목록에 없는 종목도 이름·시장 입력으로 분석 가능. 실시간 뉴스 수집 실패 시
   샘플 뉴스로 자동 폴백해 항상 결과를 반환합니다.
@@ -141,10 +141,10 @@ python -m stockrisk monitor --portfolio my_portfolio.json --interval 1800
 
 | 기간 점수 | 추천 |
 |---|---|
-| +0.45 이상 | 적극 매수 |
-| +0.15 이상 | 매수 |
-| -0.15 초과 | 보유 |
-| -0.45 초과 | 비중 축소 |
+| +0.35 이상 | 적극 매수 |
+| +0.12 이상 | 매수 |
+| -0.12 초과 | 보유 |
+| -0.35 초과 | 비중 축소 |
 | 그 이하 | 매도 |
 
 기간별 축 가중치(`data/keywords.json`의 `horizon_weights`): 예를 들어 **투자심리**는

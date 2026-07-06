@@ -7,7 +7,7 @@
   <h3>종목 추가</h3>
   <form method="post" class="form" autocomplete="off">
     <div class="form-row">
-      <label>종목명 또는 티커
+      <label class="field">종목명 또는 티커
         <input type="text" name="query" required placeholder="예: 삼성전자, AAPL" list="ticker-list">
         <datalist id="ticker-list">
           {% for t in registry %}
@@ -15,7 +15,7 @@
           {% endfor %}
         </datalist>
       </label>
-      <label>시장 <span class="muted">(목록에 없을 때)</span>
+      <label class="field">시장 <span class="muted">(목록에 없을 때)</span>
         <select name="market">
           <option value="">자동</option>
           <option value="KR">한국</option>
@@ -24,8 +24,8 @@
       </label>
     </div>
     <div class="form-row">
-      <label>보유 수량 <input type="number" name="quantity" step="any" min="0" placeholder="0"></label>
-      <label>평균 매수가 <input type="number" name="avg_price" step="any" min="0" placeholder="0"></label>
+      <label class="field">보유 수량 <input type="number" name="quantity" step="any" min="0" placeholder="0"></label>
+      <label class="field">평균 매수가 <input type="number" name="avg_price" step="any" min="0" placeholder="0"></label>
     </div>
     <button class="btn btn-primary" type="submit">추가 / 수정</button>
   </form>

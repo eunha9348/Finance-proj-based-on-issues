@@ -105,13 +105,19 @@ class NewsCollector:
         return items
 
     def collect(self, portfolio: Portfolio) -> list[NewsItem]:
-        """보유 종목 이름별 + 축별 질의로 뉴스를 모아 중복 제거 후 반환."""
+        """보유 종목 이름별 + 축별 질의로 뉴스를 모아 중복 제거 후 반환.
+
+        종목당 2개 질의(시세 + 실적/공매도)로 기업 이슈 커버리지를 넓힌다.
+        """
         collected: list[NewsItem] = []
-        # 1) 종목별 뉴스: 종목명 + '주가/stock' 를 붙여 노이즈를 줄인다
         for h in portfolio.holdings:
-            suffix = "주가" if h.market == Market.KR else "stock"
-            collected.extend(self._search(f"{h.name} {suffix}", h.market))
-        # 2) 축별 시장 뉴스
+            if h.market == Market.KR:
+                queries = [f"{h.name} 주가", f"{h.name} 실적 OR 공매도 OR 수주"]
+            else:
+                queries = [f"{h.name} stock", f"{h.name} earnings OR short OR guidance"]
+            for q in queries:
+                collected.extend(self._search(q, h.market))
+        # 축별 시장 뉴스
         markets = {h.market for h in portfolio.holdings}
         for market in markets:
             for q in AXIS_QUERIES[market]:

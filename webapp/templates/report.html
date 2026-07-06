@@ -12,7 +12,7 @@
 <div class="card">
   <h3>5대 이슈 축 요약</h3>
   <table class="table">
-    <thead><tr><th>이슈 축</th><th>감지</th><th>평균 방향성</th></tr></thead>
+    <thead><tr><th>이슈 축</th><th>감지</th><th>평균 방향성</th><th>대표 뉴스</th></tr></thead>
     <tbody>
     {% for axis in axes %}
       {% set axis_issues = result.issues | selectattr('axis', 'equalto', axis) | list %}
@@ -25,6 +25,12 @@
             <span class="{{ 'pos' if avg > 0.05 else ('neg' if avg < -0.05 else '') }}">{{ '%+.2f' % avg }}</span>
           {% else %}<span class="muted">—</span>{% endif %}
         </td>
+        <td class="muted small">
+          {% if axis_issues %}
+            {% set top = (axis_issues | sort(attribute='severity', reverse=true) | first) %}
+            {{ top.news.title[:52] }}
+          {% else %}—{% endif %}
+        </td>
       </tr>
     {% endfor %}
     </tbody>
@@ -33,9 +39,44 @@
 
 {% for impact in result.impacts %}
   {% set h = impact.holding %}
+  {% set panel = result.prices.get(h.ticker) if result.prices else None %}
   <div class="card stock-card">
     <h3>{{ h.name }} <span class="muted">{{ h.ticker }} · {{ h.market.value }}</span></h3>
 
+    {# ── 가격 차트 (실측 데이터가 있을 때만 표시) ── #}
+    {% if panel %}
+      <div class="price-panel">
+        <p class="muted small" style="margin-bottom:8px">최근 6개월 종가 ({{ panel.history.currency or '현지통화' }})</p>
+        {{ panel.svg | safe }}
+        <div class="stat-row">
+          <div class="stat-tile">
+            <div class="stat-label">현재가</div>
+            <div class="stat-value">{{ '{:,.2f}'.format(panel.history.last_close) if panel.history.last_close < 1000 else '{:,.0f}'.format(panel.history.last_close) }}</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">20일 수익률</div>
+            <div class="stat-value {{ 'pos' if panel.ret_20d and panel.ret_20d > 0 else ('neg' if panel.ret_20d and panel.ret_20d < 0 else '') }}">
+              {{ '%+.1f%%' % panel.ret_20d if panel.ret_20d is not none else '—' }}
+            </div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">연환산 변동성</div>
+            <div class="stat-value">{{ '%.0f%%' % panel.volatility if panel.volatility is not none else '—' }}</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">기간 최대낙폭</div>
+            <div class="stat-value {{ 'neg' if panel.max_drawdown and panel.max_drawdown < -5 else '' }}">
+              {{ '%.1f%%' % panel.max_drawdown if panel.max_drawdown is not none else '—' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted small">가격 데이터를 가져오지 못해 차트를 표시하지 않습니다. (추정치는 표시하지 않습니다)</p>
+    {% endif %}
+
+    {# ── 5대 축 점수 게이지 ── #}
+    <h4>이슈 축별 영향 점수</h4>
     <div class="axis-bars">
       {% for axis in axes %}
         {% set s = impact.axis_scores.get(axis, 0.0) %}
@@ -54,6 +95,29 @@
       {% endfor %}
     </div>
 
+    {# ── 축별 기여 분해 (어떤 뉴스가 몇 점을 만들었는지) ── #}
+    <details class="tactics">
+      <summary>점수 계산 근거 — 뉴스별 기여 분해</summary>
+      <table class="table axis-detail">
+        <thead><tr><th>이슈 축</th><th>뉴스</th><th>전이 경로</th><th>기여</th></tr></thead>
+        <tbody>
+        {% for axis in axes %}
+          {% for ev in impact.axis_evidence.get(axis, []) %}
+            <tr>
+              <td>{{ axis.label_ko }}</td>
+              <td class="small">{{ ev.title[:58] }}</td>
+              <td class="muted small">{{ ev.path }}</td>
+              <td class="{{ 'pos' if ev.contribution > 0 else 'neg' }}">{{ '%+.2f' % ev.contribution }}</td>
+            </tr>
+          {% endfor %}
+        {% endfor %}
+        </tbody>
+      </table>
+      <p class="muted small">기여 = 뉴스 방향성 × 심각도 × 관련도(직접 언급 100% / 섹터 상관계수 / 시장 베타).
+         축 점수는 관련도 가중 평균에 근거량 보정을 곱한 값입니다.</p>
+    </details>
+
+    {# ── 기간별 추천 ── #}
     <h4>기간별 추천</h4>
     <div class="rec-grid">
       {% for rec in result.recommendations[h.ticker] %}
@@ -66,33 +130,28 @@
     </div>
 
     {% for rec in result.recommendations[h.ticker] %}
-      <details class="tactics">
-        <summary>{{ rec.horizon.label_ko }} — 근거와 전술</summary>
+      <details class="tactics" {{ 'open' if loop.first }}>
+        <summary>{{ rec.horizon.label_ko }} — 판단 근거와 구체적 대응</summary>
         <p>{{ rec.rationale }}</p>
         {% if rec.risk_management %}
-          <p><b>리스크 관리</b></p>
+          <p><b>리스크 관리 (이 종목·이슈에 맞춘 대응)</b></p>
           <ul>{% for t in rec.risk_management %}<li>{{ t }}</li>{% endfor %}</ul>
         {% endif %}
         {% if rec.profit_strategy %}
           <p><b>수익 극대화</b></p>
           <ul>{% for t in rec.profit_strategy %}<li>{{ t }}</li>{% endfor %}</ul>
         {% endif %}
+        {% if not rec.risk_management and not rec.profit_strategy %}
+          <p class="muted">뚜렷한 방향 신호가 없어 별도 대응 없이 기존 계획 유지를 권합니다.</p>
+        {% endif %}
       </details>
     {% endfor %}
-
-    {% if impact.related_notes %}
-      <details class="tactics">
-        <summary>근거 뉴스 ({{ impact.related_notes|length }}건)</summary>
-        <ul>
-          {% for note in impact.related_notes %}<li>{{ note }}</li>{% endfor %}
-        </ul>
-      </details>
-    {% endif %}
   </div>
 {% endfor %}
 
 <div class="card disclaimer">
   ⚠️ 본 리포트는 뉴스 기반 규칙 분석의 참고 자료이며 투자 권유가 아닙니다.
+  언급된 ETF·채권·종목은 큐레이션된 예시일 뿐 특정 상품 추천이 아닙니다.
   모든 투자 판단과 책임은 투자자 본인에게 있습니다.
 </div>
 {% endblock %}

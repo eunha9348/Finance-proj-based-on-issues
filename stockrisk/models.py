@@ -144,6 +144,8 @@ class HoldingImpact:
     top_issues: list[ClassifiedIssue] = field(default_factory=list)
     # 연관 종목 경로로 전이된 영향 설명
     related_notes: list[str] = field(default_factory=list)
+    # 축별 근거 상세: axis -> [{title, link, contribution, path}] (기여 큰 순)
+    axis_evidence: dict = field(default_factory=dict)
     momentum: Optional[float] = None   # 최근 가격 모멘텀 (예: 20일 수익률)
 
     @property

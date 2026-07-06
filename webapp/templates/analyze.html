@@ -6,7 +6,7 @@
 
 <div class="card">
   <form method="post" class="form analyze-form" autocomplete="off">
-    <label>종목명 또는 티커
+    <label class="field">종목명 또는 티커
       <input type="text" id="query" name="query" required
              placeholder="예: 삼성전자, NVDA, 카카오"
              value="{{ unresolved or '' }}" list="ticker-list">
@@ -23,14 +23,14 @@
       </div>
     {% endif %}
     <div class="form-row">
-      <label>시장 <span class="muted">(목록에 없는 종목일 때)</span>
+      <label class="field">시장 <span class="muted">(목록에 없는 종목일 때)</span>
         <select name="market">
           <option value="">자동 (목록에서 찾기)</option>
           <option value="KR" {{ 'selected' if unresolved }}>한국 (KR)</option>
           <option value="US">미국 (US)</option>
         </select>
       </label>
-      <label>표시 이름 <span class="muted">(선택)</span>
+      <label class="field">표시 이름 <span class="muted">(선택)</span>
         <input type="text" name="name" placeholder="비워두면 입력값 사용">
       </label>
     </div>

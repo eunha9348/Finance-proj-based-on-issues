@@ -1,0 +1,126 @@
+{
+  "_comment": "축별·섹터별 헤지/대응 수단 큐레이션. 모든 항목은 실존하는 상장 상품이며, 추천 문구에는 '예시'로만 제시된다. 특정 시점의 가격·수익률 정보는 포함하지 않는다.",
+  "axis_hedges": {
+    "war_global": {
+      "when": "negative",
+      "label": "전쟁·지정학 리스크 헤지",
+      "instruments": {
+        "US": [
+          {"ticker": "GLD", "name": "SPDR Gold Shares (금 ETF)", "why": "지정학 위기 시 안전자산 수요로 주식과 낮은 상관관계"},
+          {"ticker": "LMT / RTX", "name": "Lockheed Martin / RTX (방산주)", "why": "분쟁 장기화 국면에서 방산 수주 증가 수혜"},
+          {"ticker": "USO", "name": "United States Oil Fund (원유 ETF)", "why": "중동발 공급 불안 시 유가 상승 노출 확보"}
+        ],
+        "KR": [
+          {"ticker": "132030.KS", "name": "KODEX 골드선물(H)", "why": "금 가격 추종으로 위기 국면 완충"},
+          {"ticker": "012450.KS / 079550.KS", "name": "한화에어로스페이스 / LIG넥스원 (방산주)", "why": "지정학 긴장 시 방산 수출 모멘텀"},
+          {"ticker": "261220.KS", "name": "KODEX WTI원유선물(H)", "why": "유가 급등 국면 헤지"}
+        ]
+      }
+    },
+    "macro_finance_rate_cut": {
+      "when": "positive",
+      "label": "금리인하 국면 수혜 포지션",
+      "instruments": {
+        "US": [
+          {"ticker": "TLT", "name": "iShares 20+ Year Treasury (미 장기국채 ETF)", "why": "금리 하락 시 장기채 가격 상승폭이 가장 큼"},
+          {"ticker": "IEF", "name": "iShares 7-10 Year Treasury (미 중기국채 ETF)", "why": "장기채보다 변동성 낮은 금리인하 수혜"},
+          {"ticker": "QQQ", "name": "Invesco QQQ (나스닥100 ETF)", "why": "할인율 하락으로 성장주 밸류에이션 회복 수혜"}
+        ],
+        "KR": [
+          {"ticker": "148070.KS", "name": "KOSEF 국고채10년", "why": "국내 금리인하 시 중장기 국채 가격 상승"},
+          {"ticker": "114260.KS", "name": "KODEX 국고채3년", "why": "보수적 금리인하 수혜 + 낮은 변동성"},
+          {"ticker": "229200.KQ", "name": "KODEX 코스닥150", "why": "금리 하락 시 성장주 중심 코스닥 수혜"}
+        ]
+      }
+    },
+    "macro_finance_rate_hike": {
+      "when": "negative",
+      "label": "금리인상·긴축 국면 방어",
+      "instruments": {
+        "US": [
+          {"ticker": "SHY", "name": "iShares 1-3 Year Treasury (미 단기국채 ETF)", "why": "듀레이션이 짧아 금리 상승 손실 최소화, 현금 대용"},
+          {"ticker": "SGOV", "name": "iShares 0-3 Month Treasury Bill", "why": "초단기 국채로 사실상 무위험 이자 수취"},
+          {"ticker": "JPM / BAC", "name": "JPMorgan / Bank of America (은행주)", "why": "금리 상승기 순이자마진 확대 수혜"}
+        ],
+        "KR": [
+          {"ticker": "153130.KS", "name": "KODEX 단기채권", "why": "금리 상승기 원금 방어형 파킹 수단"},
+          {"ticker": "105560.KS / 055550.KS", "name": "KB금융 / 신한지주 (은행주)", "why": "금리 상승기 이자이익 확대 수혜"}
+        ]
+      }
+    },
+    "sentiment": {
+      "when": "negative",
+      "label": "투자심리 급랭·변동성 확대 방어",
+      "instruments": {
+        "US": [
+          {"ticker": "SH", "name": "ProShares Short S&P500 (1배 인버스)", "why": "지수 하락 구간 단기 헤지 (레버리지 없는 1배물 권장)"},
+          {"ticker": "SGOV", "name": "iShares 0-3 Month Treasury Bill", "why": "현금 비중 확대의 실질적 수단"}
+        ],
+        "KR": [
+          {"ticker": "114800.KS", "name": "KODEX 인버스 (코스피200 1배 인버스)", "why": "지수 하락 구간 단기 헤지. 장기 보유 시 복리 손실 주의"},
+          {"ticker": "153130.KS", "name": "KODEX 단기채권", "why": "변동성 구간 현금성 대피처"}
+        ]
+      }
+    },
+    "geopolitics": {
+      "when": "negative",
+      "label": "관세·규제 등 정책 리스크 완충",
+      "instruments": {
+        "US": [
+          {"ticker": "UUP", "name": "Invesco DB US Dollar Bullish (달러 ETF)", "why": "무역분쟁 격화 시 달러 강세 경향으로 완충"},
+          {"ticker": "XLU", "name": "Utilities Select Sector SPDR (유틸리티)", "why": "관세 영향이 작은 내수·방어 섹터"}
+        ],
+        "KR": [
+          {"ticker": "261240.KS", "name": "KODEX 미국달러선물", "why": "원화 약세(환율 상승) 국면 헤지"},
+          {"ticker": "069500.KS", "name": "KODEX 200 등 지수 분산", "why": "개별 수출주 집중도를 낮춰 정책 충격 분산"}
+        ]
+      }
+    }
+  },
+  "sector_hedges": {
+    "semiconductor": {
+      "diversify": {"US": "SOXX (iShares Semiconductor ETF)", "KR": "091160.KS (KODEX 반도체)"},
+      "note": "개별 종목 리스크는 섹터 ETF로 분산하되, 섹터 전체 악재(관세·수출규제)에는 섹터 ETF도 함께 하락함에 유의"
+    },
+    "ev_battery": {
+      "diversify": {"US": "LIT (Global X Lithium & Battery Tech ETF)", "KR": "305720.KS (KODEX 2차전지산업)"},
+      "note": "전기차 수요 둔화 국면에서는 섹터 전반이 동반 약세이므로 비중 자체를 줄이는 것이 유효"
+    },
+    "bigtech": {
+      "diversify": {"US": "QQQ (나스닥100)", "KR": "133690.KS (TIGER 미국나스닥100)"},
+      "note": "반독점·규제 이슈는 개별 기업별 편차가 크므로 지수 분산이 유효"
+    },
+    "auto": {
+      "diversify": {"US": "CARZ (First Trust S-Network Future Vehicles)", "KR": "091180.KS (KODEX 자동차)"},
+      "note": "관세 이슈에 민감한 섹터로, 내수 비중이 높은 종목과 혼합 보유 권장"
+    },
+    "bio_pharma": {
+      "diversify": {"US": "XLV (Health Care Select SPDR)", "KR": "244580.KS (KODEX 바이오)"},
+      "note": "개별 임상 이벤트 리스크가 커 종목 분산 효과가 특히 큼"
+    },
+    "finance": {
+      "diversify": {"US": "XLF (Financial Select SPDR)", "KR": "091170.KS (KODEX 은행)"},
+      "note": "금리 방향성에 섹터 전체가 동조하므로 금리 전망과 함께 판단"
+    },
+    "defense": {
+      "diversify": {"US": "ITA (iShares U.S. Aerospace & Defense)", "KR": "449450.KS (PLUS K방산)"},
+      "note": "지정학 완화(휴전·종전) 뉴스가 섹터 공통 악재로 작용함에 유의"
+    },
+    "energy_oil": {
+      "diversify": {"US": "XLE (Energy Select SPDR)", "KR": "139250.KS (TIGER 200 에너지화학)"},
+      "note": "유가 방향에 동조. 유가 하락 헤지는 항공·운송주와 상쇄 관계 활용 가능"
+    },
+    "shipbuilding": {
+      "diversify": {"US": "—", "KR": "466920.KS (SOL 조선TOP3플러스)"},
+      "note": "수주 사이클 산업으로 단일 수주 뉴스보다 수주잔고 추세가 본질"
+    },
+    "retail_consumer": {
+      "diversify": {"US": "XLP (Consumer Staples SPDR)", "KR": "227560.KS (TIGER 200 생활소비재)"},
+      "note": "경기 둔화 국면에서 필수소비재가 임의소비재보다 방어적"
+    },
+    "entertainment": {
+      "diversify": {"US": "COMM 서비스 XLC", "KR": "364990.KS (TIGER 미디어컨텐츠)"},
+      "note": "개별 아티스트·콘텐츠 이벤트 리스크가 커 분산 효과 큼"
+    }
+  }
+}

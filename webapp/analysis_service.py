@@ -17,6 +17,7 @@ from stockrisk.models import (
     ClassifiedIssue, Holding, HoldingImpact, Market, Portfolio, Recommendation,
 )
 from stockrisk.news.collector import NewsCollector, load_news_from_file
+from stockrisk.prices import PriceHistory, fetch_history, render_price_svg
 from stockrisk.report import build_report
 from stockrisk.strategy.recommender import StrategyRecommender
 
@@ -59,6 +60,17 @@ def resolve_stock(query: str) -> dict | None:
 
 
 @dataclass
+class PricePanel:
+    """리포트에 표시할 가격 섹션. history가 실측 데이터일 때만 생성된다."""
+    history: PriceHistory
+    svg: str
+    ret_20d: float | None
+    ret_60d: float | None
+    volatility: float | None
+    max_drawdown: float | None
+
+
+@dataclass
 class AnalysisResult:
     portfolio: Portfolio
     issues: list[ClassifiedIssue]
@@ -66,14 +78,36 @@ class AnalysisResult:
     recommendations: dict[str, list[Recommendation]]
     report_md: str
     news_count: int
-    offline: bool               # True면 샘플 뉴스 기반
+    offline: bool                               # True면 샘플 뉴스 기반
+    prices: dict[str, PricePanel] = None        # ticker → 가격 패널 (실패 시 항목 없음)
+
+
+def _build_price_panels(holdings: list[Holding], fetch_prices: bool) -> dict[str, PricePanel]:
+    """종목별 가격 패널. 조회 실패 종목은 제외 — 가격을 추정하지 않는다."""
+    panels: dict[str, PricePanel] = {}
+    if not fetch_prices:
+        return panels
+    for h in holdings:
+        hist = fetch_history(h.ticker)
+        if hist is None:
+            continue
+        panels[h.ticker] = PricePanel(
+            history=hist,
+            svg=render_price_svg(hist),
+            ret_20d=hist.return_over(20),
+            ret_60d=hist.return_over(60),
+            volatility=hist.annualized_volatility,
+            max_drawdown=hist.max_drawdown,
+        )
+    return panels
 
 
 def run_analysis(
     holdings: list[Holding],
     risk_profile: str = "balanced",
     live_news: bool = True,
-    per_query_limit: int = 8,
+    per_query_limit: int = 15,
+    fetch_prices: bool = True,
 ) -> AnalysisResult:
     portfolio = Portfolio(owner="web", holdings=holdings)
 
@@ -100,6 +134,7 @@ def run_analysis(
         report_md=report_md,
         news_count=len({n.link or n.title for n in news}),
         offline=offline,
+        prices=_build_price_panels(holdings, fetch_prices),
     )
 
 
