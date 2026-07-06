@@ -1,19 +1,17 @@
 {% extends "base.html" %}
 {% block title %}포트폴리오 — IssueLens{% endblock %}
 {% block content %}
-<h2>💼 내 포트폴리오</h2>
+<h2>내 포트폴리오</h2>
 
 <div class="card">
   <h3>종목 추가</h3>
   <form method="post" class="form" autocomplete="off">
     <div class="form-row">
       <label class="field">종목명 또는 티커
-        <input type="text" name="query" required placeholder="예: 삼성전자, AAPL" list="ticker-list">
-        <datalist id="ticker-list">
-          {% for t in registry %}
-            <option value="{{ t['name'] }}">{{ t['ticker'] }} ({{ t['market'] }})</option>
-          {% endfor %}
-        </datalist>
+        <span class="ac-wrap">
+          <input type="text" name="query" required data-autocomplete placeholder="예: 삼성전자, AAPL">
+          <span class="ac-panel"></span>
+        </span>
       </label>
       <label class="field">시장 <span class="muted">(목록에 없을 때)</span>
         <select name="market">

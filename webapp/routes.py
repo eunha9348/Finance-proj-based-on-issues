@@ -8,7 +8,8 @@ from flask import (
 
 from stockrisk.models import Holding, Market
 from webapp.analysis_service import (
-    holding_from_input, run_analysis, search_registry, ticker_registry,
+    holding_from_input, investor_views, run_analysis, search_registry,
+    ticker_registry,
 )
 from webapp.auth import login_required
 from webapp.db import get_db
@@ -112,6 +113,7 @@ def analyze():
             "report.html",
             result=result,
             analysis_id=analysis_id,
+            investors=investor_views([holding.ticker]),
             title=f"{holding.name} ({holding.ticker}) 분석 리포트",
         )
     return render_template("analyze.html", registry=ticker_registry())
@@ -134,6 +136,7 @@ def analyze_portfolio():
     analysis_id = _save_analysis("portfolio", "portfolio", result)
     return render_template(
         "report.html", result=result, analysis_id=analysis_id,
+        investors=investor_views([h.ticker for h in holdings]),
         title="내 포트폴리오 종합 리포트",
     )
 

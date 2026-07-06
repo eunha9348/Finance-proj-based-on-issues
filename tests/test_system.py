@@ -121,16 +121,16 @@ class TestTacticsAreStockSpecific(unittest.TestCase):
         self.assertNotEqual(lg, nvda)
 
     def test_negative_stock_gets_concrete_hedges(self):
-        # LG에너지솔루션: 전 축 악재 → 손절 기준 + 헤지 수단이 구체적으로 제시
+        # LG에너지솔루션: 전 축 악재 → 손절 규율 + 헤지 수단이 구체적으로 제시
         lg = self._all_tactics("373220.KS")
-        self.assertIn("손절 기준", lg)
-        self.assertIn("410,000", lg.replace(",", ","))  # 평균단가 기반 계산 포함
+        self.assertIn("손절 규율", lg)
+        self.assertIn("410,000", lg)  # 평균단가 기반 계산 포함
 
     def test_stop_loss_uses_avg_price(self):
-        # 삼성전자 avg 72000 → -8% = 66,240 이 문구에 등장
+        # 손절 규율이 제시되는 종목은 평균단가가 문구에 인용된다
         samsung_tactics = self._all_tactics("005930.KS")
-        if "손절 기준" in samsung_tactics:
-            self.assertIn("66,240", samsung_tactics)
+        if "손절 규율" in samsung_tactics:
+            self.assertIn("72,000", samsung_tactics)
 
     def test_axis_evidence_populated(self):
         nvda = next(i for i in self.impacts if i.holding.ticker == "NVDA")

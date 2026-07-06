@@ -27,21 +27,32 @@ LOCALE = {
     Market.US: {"hl": "en-US", "gl": "US", "ceid": "US:en"},
 }
 
-# 이슈 축별 시장 전반 뉴스 검색 질의 (시장별)
+# 이슈 축별 시장 전반 뉴스 검색 질의 (시장별).
+# 악재 편향을 막기 위해 긍정·부정 방향 질의를 축마다 균형 있게 포함한다.
 AXIS_QUERIES = {
     Market.KR: [
-        "증시 정치 규제",
+        "증시 정치 규제 관세",
+        "증시 정책 지원 보조금 호재",
         "전쟁 지정학 리스크 증시",
-        "코스피 투자심리 급락 급등",
-        "한국은행 기준금리 금리",
+        "휴전 종전 협상 증시",
+        "코스피 급락 투매 투자심리",
+        "코스피 반등 랠리 외국인 순매수",
+        "한국은행 기준금리 인하",
+        "금리 인상 긴축 물가",
         "공매도 증시",
+        "실적 호조 어닝 서프라이즈 코스피",
     ],
     Market.US: [
-        "stock market politics tariff regulation",
+        "stock market tariff regulation",
+        "stock market subsidy policy boost",
         "war geopolitical risk stocks",
-        "stock market sentiment selloff rally",
-        "Fed interest rate cut FOMC",
-        "short selling stock market",
+        "ceasefire peace talks markets",
+        "stock market selloff panic",
+        "stock market rally record high",
+        "Fed rate cut FOMC",
+        "Fed rate hike inflation tightening",
+        "short selling squeeze stocks",
+        "earnings beat guidance raised stocks",
     ],
 }
 
@@ -107,21 +118,32 @@ class NewsCollector:
     def collect(self, portfolio: Portfolio) -> list[NewsItem]:
         """보유 종목 이름별 + 축별 질의로 뉴스를 모아 중복 제거 후 반환.
 
-        종목당 2개 질의(시세 + 실적/공매도)로 기업 이슈 커버리지를 넓힌다.
+        - 종목당 3개 질의: 일반 시세 + 호재 방향 + 악재 방향 (편향 없는 수집)
+        - 모든 질의는 스레드 풀로 병렬 수집해 질의 수 확대에도 응답 시간 유지
         """
-        collected: list[NewsItem] = []
+        from concurrent.futures import ThreadPoolExecutor
+
+        jobs: list[tuple[str, Market]] = []
         for h in portfolio.holdings:
             if h.market == Market.KR:
-                queries = [f"{h.name} 주가", f"{h.name} 실적 OR 공매도 OR 수주"]
+                jobs += [
+                    (f"{h.name} 주가", h.market),
+                    (f"{h.name} 실적 OR 수주 OR 상향", h.market),
+                    (f"{h.name} 하락 OR 소송 OR 공매도", h.market),
+                ]
             else:
-                queries = [f"{h.name} stock", f"{h.name} earnings OR short OR guidance"]
-            for q in queries:
-                collected.extend(self._search(q, h.market))
-        # 축별 시장 뉴스
-        markets = {h.market for h in portfolio.holdings}
-        for market in markets:
-            for q in AXIS_QUERIES[market]:
-                collected.extend(self._search(q, market))
+                jobs += [
+                    (f"{h.name} stock", h.market),
+                    (f"{h.name} earnings OR upgrade OR beats", h.market),
+                    (f"{h.name} lawsuit OR short OR downgrade", h.market),
+                ]
+        for market in {h.market for h in portfolio.holdings}:
+            jobs += [(q, market) for q in AXIS_QUERIES[market]]
+
+        collected: list[NewsItem] = []
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            for items in pool.map(lambda j: self._search(j[0], j[1]), jobs):
+                collected.extend(items)
         return _dedupe(collected)
 
 

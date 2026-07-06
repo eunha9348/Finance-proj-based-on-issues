@@ -2,13 +2,15 @@
 {% block title %}투자 성향 진단 — IssueLens{% endblock %}
 {% block content %}
 <div class="survey-box">
-  <h2>🧭 투자 성향 진단</h2>
-  <p class="muted">6개 문항에 답하면 안정형 · 위험중립형 · 공격형 중 나의 성향을 진단하고,
-     이후 모든 추천의 매수·매도 기준이 성향에 맞게 보정됩니다.</p>
+  <h2>투자 성향 진단</h2>
+  <p class="muted" style="margin-bottom:22px">
+    6개 문항에 답하면 안정형 · 위험중립형 · 공격형 중 나의 성향을 진단하고,
+    이후 모든 추천의 매수·매도 기준이 성향에 맞게 보정됩니다.
+  </p>
   <form method="post" class="form">
     {% for question, options in questions %}
-      <fieldset class="card q-card">
-        <legend>Q{{ loop.index }}. {{ question }}</legend>
+      <div class="q-card">
+        <p class="q-title">Q{{ loop.index }}. {{ question }}</p>
         {% set qidx = loop.index0 %}
         {% for label, _score in options %}
           <label class="radio-row">
@@ -16,7 +18,7 @@
             <span>{{ label }}</span>
           </label>
         {% endfor %}
-      </fieldset>
+      </div>
     {% endfor %}
     <button class="btn btn-primary btn-lg" type="submit">진단 결과 보기</button>
   </form>

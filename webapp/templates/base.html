@@ -1,16 +1,26 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}IssueLens — 이슈 기반 투자 리스크 분석{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    /* 첫 페인트 전 저장된 테마 적용 (깜빡임 방지) */
+    (function () {
+      try {
+        var t = localStorage.getItem("issuelens-theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
 <header class="topbar">
   <div class="container topbar-inner">
     <a class="brand" href="{{ url_for('main.index') }}">
-      <span class="brand-mark">◍</span> IssueLens
+      <span class="brand-mark">Issue</span>Lens
     </a>
     <nav class="nav">
       {% if g.user %}
@@ -18,11 +28,13 @@
         <a href="{{ url_for('main.analyze') }}">종목 분석</a>
         <a href="{{ url_for('main.portfolio') }}">포트폴리오</a>
         <a href="{{ url_for('main.history') }}">분석 이력</a>
-        <a href="{{ url_for('main.about') }}">서비스 소개</a>
+        <a href="{{ url_for('main.about') }}">소개</a>
+        <button id="theme-toggle" type="button">라이트 모드</button>
         <span class="nav-user">{{ g.user['name'] }}님</span>
-        <a class="btn btn-ghost" href="{{ url_for('auth.logout') }}">로그아웃</a>
+        <a class="btn btn-ghost small-btn" href="{{ url_for('auth.logout') }}">로그아웃</a>
       {% else %}
-        <a href="{{ url_for('main.about') }}">서비스 소개</a>
+        <a href="{{ url_for('main.about') }}">소개</a>
+        <button id="theme-toggle" type="button">라이트 모드</button>
         <a class="btn btn-ghost" href="{{ url_for('auth.login') }}">로그인</a>
         <a class="btn btn-primary" href="{{ url_for('auth.register') }}">시작하기</a>
       {% endif %}
@@ -44,7 +56,7 @@
 
 <footer class="footer">
   <div class="container">
-    <p>⚠️ IssueLens의 모든 분석·추천은 뉴스 기반 규칙 분석의 참고 자료이며 투자 권유가 아닙니다.
+    <p>IssueLens의 모든 분석·추천은 뉴스 기반 규칙 분석의 참고 자료이며 투자 권유가 아닙니다.
        모든 투자 판단과 책임은 투자자 본인에게 있습니다.</p>
     <p>© 2026 IssueLens · <a href="https://github.com/eunha9348/Finance-proj-based-on-issues">GitHub</a></p>
   </div>

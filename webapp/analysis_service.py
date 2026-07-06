@@ -26,6 +26,7 @@ TICKERS_PATH = ROOT / "data" / "tickers.json"
 SAMPLE_NEWS = ROOT / "samples" / "sample_news.json"
 
 _registry_cache: list[dict] | None = None
+_investors_cache: dict | None = None
 
 
 def ticker_registry() -> list[dict]:
@@ -33,6 +34,24 @@ def ticker_registry() -> list[dict]:
     if _registry_cache is None:
         _registry_cache = json.loads(TICKERS_PATH.read_text(encoding="utf-8"))["tickers"]
     return _registry_cache
+
+
+def investor_views(tickers: list[str]) -> dict:
+    """티커별 유명 투자자 견해 (큐레이션 데이터에 있는 종목만).
+
+    반환: {"disclaimer": str, "by_ticker": {ticker: [entry, ...]}}
+    데이터가 없는 종목은 포함되지 않는다 — 추정·생성하지 않는다.
+    """
+    global _investors_cache
+    if _investors_cache is None:
+        _investors_cache = json.loads(
+            (ROOT / "data" / "investors.json").read_text(encoding="utf-8")
+        )
+    stocks = _investors_cache.get("stocks", {})
+    return {
+        "disclaimer": _investors_cache.get("disclaimer", ""),
+        "by_ticker": {t: stocks[t] for t in tickers if t in stocks},
+    }
 
 
 def search_registry(query: str) -> list[dict]:
@@ -124,6 +143,15 @@ def run_analysis(
     classifier = IssueClassifier()
     issues = classifier.classify_all(news, portfolio)
     impacts = ImpactAnalyzer().analyze(portfolio, issues)
+
+    # 가격 패널을 먼저 만들고, 실측 20일 수익률을 모멘텀으로 주입한 뒤 추천
+    # (가격 데이터가 없으면 momentum=None → 추천에 반영되지 않음)
+    prices = _build_price_panels(holdings, fetch_prices)
+    for imp in impacts:
+        panel = prices.get(imp.holding.ticker)
+        if panel and panel.ret_20d is not None:
+            imp.momentum = round(panel.ret_20d, 2)
+
     recommendations = StrategyRecommender(risk_profile=risk_profile).recommend_all(impacts)
     report_md = build_report(portfolio, issues, impacts, recommendations)
     return AnalysisResult(
@@ -134,7 +162,7 @@ def run_analysis(
         report_md=report_md,
         news_count=len({n.link or n.title for n in news}),
         offline=offline,
-        prices=_build_price_panels(holdings, fetch_prices),
+        prices=prices,
     )
 
 

@@ -1,26 +1,25 @@
 {% extends "base.html" %}
 {% block title %}종목 분석 — IssueLens{% endblock %}
 {% block content %}
-<h2>🔎 종목 분석</h2>
-<p class="muted">어떤 종목이든 입력하세요. 목록에 없는 종목도 시장(한국/미국)을 지정하면 분석합니다.</p>
+<h2>종목 분석</h2>
+<p class="muted">어떤 종목이든 입력하세요. 입력하면 시장별로 자동완성되며,
+   목록에 없는 종목도 시장(한국/미국)을 지정하면 분석합니다.</p>
 
 <div class="card">
   <form method="post" class="form analyze-form" autocomplete="off">
     <label class="field">종목명 또는 티커
-      <input type="text" id="query" name="query" required
-             placeholder="예: 삼성전자, NVDA, 카카오"
-             value="{{ unresolved or '' }}" list="ticker-list">
-      <datalist id="ticker-list">
-        {% for t in registry %}
-          <option value="{{ t['name'] }}">{{ t['ticker'] }} ({{ t['market'] }})</option>
-        {% endfor %}
-      </datalist>
+      <span class="ac-wrap">
+        <input type="text" id="query" name="query" required data-autocomplete
+               placeholder="예: 삼성전자, NVDA, 카카오">
+        <span class="ac-panel"></span>
+      </span>
     </label>
     {% if unresolved %}
       <div class="flash">
         '<b>{{ unresolved }}</b>' 종목을 목록에서 찾지 못했습니다.
         아래에서 시장을 선택하면 해당 이름 그대로 뉴스를 수집해 분석합니다.
       </div>
+      <script>document.addEventListener("DOMContentLoaded",function(){document.getElementById("query").value={{ unresolved|tojson }};});</script>
     {% endif %}
     <div class="form-row">
       <label class="field">시장 <span class="muted">(목록에 없는 종목일 때)</span>
@@ -35,19 +34,29 @@
       </label>
     </div>
     <button class="btn btn-primary btn-lg" type="submit">분석 시작</button>
-    <p class="muted small">실시간 뉴스 수집에는 수십 초가 걸릴 수 있습니다. 수집 실패 시 샘플 뉴스로 자동 전환됩니다.</p>
+    <p class="muted small">실시간 뉴스·시세 수집에는 수십 초가 걸릴 수 있습니다. 수집 실패 시 샘플 뉴스로 자동 전환됩니다.</p>
   </form>
 </div>
 
 <div class="card">
   <h3>인기 종목 바로 분석</h3>
-  <div class="chip-row">
-    {% for t in registry[:16] %}
+  <div class="chip-row" style="margin-bottom:10px">
+    <span class="chip-label">한국</span>
+    {% for t in registry if t['market'] == 'KR' %}{% if loop.index <= 8 %}
       <form method="post" style="display:inline">
         <input type="hidden" name="query" value="{{ t['ticker'] }}">
         <button class="chip" type="submit">{{ t['name'] }}</button>
       </form>
-    {% endfor %}
+    {% endif %}{% endfor %}
+  </div>
+  <div class="chip-row">
+    <span class="chip-label">미국</span>
+    {% for t in registry if t['market'] == 'US' %}{% if loop.index <= 8 %}
+      <form method="post" style="display:inline">
+        <input type="hidden" name="query" value="{{ t['ticker'] }}">
+        <button class="chip" type="submit">{{ t['name'] }}</button>
+      </form>
+    {% endif %}{% endfor %}
   </div>
 </div>
 {% endblock %}

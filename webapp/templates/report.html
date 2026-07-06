@@ -9,7 +9,7 @@
   · <a href="{{ url_for('main.history_detail', analysis_id=analysis_id) }}">이력에 저장됨</a>
 </p>
 
-<div class="card">
+<div class="card reveal">
   <h3>5대 이슈 축 요약</h3>
   <table class="table">
     <thead><tr><th>이슈 축</th><th>감지</th><th>평균 방향성</th><th>대표 뉴스</th></tr></thead>
@@ -28,7 +28,8 @@
         <td class="muted small">
           {% if axis_issues %}
             {% set top = (axis_issues | sort(attribute='severity', reverse=true) | first) %}
-            {{ top.news.title[:52] }}
+            {% if top.news.link %}<a href="{{ top.news.link }}" target="_blank" rel="noopener">{{ top.news.title[:50] }}</a>
+            {% else %}{{ top.news.title[:50] }}{% endif %}
           {% else %}—{% endif %}
         </td>
       </tr>
@@ -40,10 +41,25 @@
 {% for impact in result.impacts %}
   {% set h = impact.holding %}
   {% set panel = result.prices.get(h.ticker) if result.prices else None %}
-  <div class="card stock-card">
+  <div class="card stock-card reveal">
     <h3>{{ h.name }} <span class="muted">{{ h.ticker }} · {{ h.market.value }}</span></h3>
 
-    {# ── 가격 차트 (실측 데이터가 있을 때만 표시) ── #}
+    {# ── 주요 근거 뉴스 링크 (원문 바로 열람) ── #}
+    {% if impact.top_issues %}
+      <h4>주요 뉴스</h4>
+      <ul class="headline-links">
+        {% for iss in impact.top_issues[:4] %}
+          <li>
+            <span class="hl-axis">{{ iss.axis.label_ko }}</span>
+            {% if iss.news.link %}
+              <a href="{{ iss.news.link }}" target="_blank" rel="noopener">{{ iss.news.title[:72] }}</a>
+            {% else %}{{ iss.news.title[:72] }}{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {# ── 가격 차트 (실측 데이터가 있을 때만) ── #}
     {% if panel %}
       <div class="price-panel">
         <p class="muted small" style="margin-bottom:8px">최근 6개월 종가 ({{ panel.history.currency or '현지통화' }})</p>
@@ -95,17 +111,20 @@
       {% endfor %}
     </div>
 
-    {# ── 축별 기여 분해 (어떤 뉴스가 몇 점을 만들었는지) ── #}
+    {# ── 축별 기여 분해 ── #}
     <details class="tactics">
       <summary>점수 계산 근거 — 뉴스별 기여 분해</summary>
       <table class="table axis-detail">
-        <thead><tr><th>이슈 축</th><th>뉴스</th><th>전이 경로</th><th>기여</th></tr></thead>
+        <thead><tr><th>이슈 축</th><th>뉴스 (클릭 시 원문)</th><th>전이 경로</th><th>기여</th></tr></thead>
         <tbody>
         {% for axis in axes %}
           {% for ev in impact.axis_evidence.get(axis, []) %}
             <tr>
               <td>{{ axis.label_ko }}</td>
-              <td class="small">{{ ev.title[:58] }}</td>
+              <td class="small">
+                {% if ev.link %}<a href="{{ ev.link }}" target="_blank" rel="noopener">{{ ev.title[:56] }}</a>
+                {% else %}{{ ev.title[:56] }}{% endif %}
+              </td>
               <td class="muted small">{{ ev.path }}</td>
               <td class="{{ 'pos' if ev.contribution > 0 else 'neg' }}">{{ '%+.2f' % ev.contribution }}</td>
             </tr>
@@ -114,8 +133,31 @@
         </tbody>
       </table>
       <p class="muted small">기여 = 뉴스 방향성 × 심각도 × 관련도(직접 언급 100% / 섹터 상관계수 / 시장 베타).
-         축 점수는 관련도 가중 평균에 근거량 보정을 곱한 값입니다.</p>
+         기간 점수에는 실측 20일 가격 모멘텀이 기간별 계수(단기 0.5 / 중기 0.25 / 장기 0.1)로 가산됩니다.</p>
     </details>
+
+    {# ── 유명 투자자 견해 (큐레이션 데이터가 있는 종목만) ── #}
+    {% if investors and investors.by_ticker.get(h.ticker) %}
+      <h4>유명 투자자·기관 동향</h4>
+      <div class="investor-grid">
+        {% for inv in investors.by_ticker[h.ticker] %}
+          <div class="investor-card">
+            <div class="avatar">{{ inv.initials }}</div>
+            <div>
+              <div class="investor-head">
+                <span class="investor-name">{{ inv.name }}</span>
+                <span class="investor-org">{{ inv.name_en }} · {{ inv.org }}</span>
+                <span class="stance-badge {{ inv.stance }}">{{ inv.stance_label }}</span>
+              </div>
+              <p><b>지분</b> — {{ inv.stake }}</p>
+              <p><b>견해</b> — {{ inv.view }}</p>
+              <p class="as-of">{{ inv.as_of }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <p class="muted small">{{ investors.disclaimer }}</p>
+    {% endif %}
 
     {# ── 기간별 추천 ── #}
     <h4>기간별 추천</h4>
@@ -134,7 +176,7 @@
         <summary>{{ rec.horizon.label_ko }} — 판단 근거와 구체적 대응</summary>
         <p>{{ rec.rationale }}</p>
         {% if rec.risk_management %}
-          <p><b>리스크 관리 (이 종목·이슈에 맞춘 대응)</b></p>
+          <p><b>리스크 관리 · 헤지</b></p>
           <ul>{% for t in rec.risk_management %}<li>{{ t }}</li>{% endfor %}</ul>
         {% endif %}
         {% if rec.profit_strategy %}
@@ -150,8 +192,9 @@
 {% endfor %}
 
 <div class="card disclaimer">
-  ⚠️ 본 리포트는 뉴스 기반 규칙 분석의 참고 자료이며 투자 권유가 아닙니다.
-  언급된 ETF·채권·종목은 큐레이션된 예시일 뿐 특정 상품 추천이 아닙니다.
+  본 리포트는 뉴스 기반 규칙 분석의 참고 자료이며 투자 권유가 아닙니다.
+  언급된 ETF·채권·종목은 큐레이션된 예시일 뿐 특정 상품 추천이 아니며,
+  투자자 지분·견해 정보는 기준 시점 이후 변동될 수 있습니다.
   모든 투자 판단과 책임은 투자자 본인에게 있습니다.
 </div>
 {% endblock %}

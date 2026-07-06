@@ -1,0 +1,119 @@
+{
+  "_comment": "유명 투자자·기관의 특정 종목 지분/견해 큐레이션. 원칙: (1) 공시(13F·대량보유보고)와 널리 보도된 공개 발언만 수록 (2) 모든 항목에 기준 시점(as_of) 명시 (3) 수치는 '약'으로 표기하고 시점 이후 변동 가능성을 UI에 고지 (4) 데이터가 없는 종목은 섹션 자체를 표시하지 않음 — 추정·생성 금지.",
+  "disclaimer": "아래 정보는 과거 공시(13F 등)와 언론에 보도된 공개 발언을 정리한 것으로, 기준 시점 이후 지분과 견해가 변했을 수 있습니다. 최신 지분은 SEC EDGAR·DART 공시를 확인하세요.",
+  "stocks": {
+    "AAPL": [
+      {
+        "name": "워런 버핏",
+        "name_en": "Warren Buffett",
+        "org": "Berkshire Hathaway",
+        "initials": "WB",
+        "stance": "bull",
+        "stance_label": "장기 강세 (비중은 축소)",
+        "stake": "버크셔의 최대 주식 보유 종목. 2024년 중 지분 약 3분의 2를 매도해 약 3억 주 수준으로 축소한 뒤에도 최대 보유 종목 지위 유지",
+        "view": "애플을 '세계 최고 수준의 소비자 브랜드이자 사실상 소비재 기업'으로 평가해왔으며, 2024년 매도에 대해서는 세금 요인 등을 언급. 매도 후에도 장기 보유 기조를 밝힘",
+        "as_of": "2024년 3분기 13F 공시·주주총회 발언 기준"
+      }
+    ],
+    "NVDA": [
+      {
+        "name": "스탠리 드러켄밀러",
+        "name_en": "Stanley Druckenmiller",
+        "org": "Duquesne Family Office",
+        "initials": "SD",
+        "stance": "mixed",
+        "stance_label": "강세론 유지, 밸류에이션 경계",
+        "stake": "2022~2023년 대량 보유 후 2024년 상반기 대부분 매도",
+        "view": "AI 수요 자체는 실재한다고 평가하면서도 단기 밸류에이션 부담을 이유로 차익 실현. 이후 인터뷰에서 '매도는 실수였다'고 언급한 것으로 보도됨",
+        "as_of": "2024년 13F 공시·언론 인터뷰 기준"
+      },
+      {
+        "name": "캐시 우드",
+        "name_en": "Cathie Wood",
+        "org": "ARK Invest",
+        "initials": "CW",
+        "stance": "mixed",
+        "stance_label": "AI 강세, 개별 비중은 낮음",
+        "stake": "ARK ETF에서 초기 대량 보유했으나 2022~2023년 대부분 정리",
+        "view": "AI 산업 전반에는 강세 견해를 유지하되, 엔비디아보다 소프트웨어·응용 단계 기업의 수혜가 클 것이라는 의견을 공개적으로 밝힘",
+        "as_of": "ARK 공시·공개 서한 기준 (2024년)"
+      }
+    ],
+    "TSLA": [
+      {
+        "name": "캐시 우드",
+        "name_en": "Cathie Wood",
+        "org": "ARK Invest",
+        "initials": "CW",
+        "stance": "bull",
+        "stance_label": "대표적 강세론자",
+        "stake": "ARK 주요 ETF의 핵심 보유 종목 (펀드별 상위 비중)",
+        "view": "자율주행·로보택시의 장기 가치를 근거로 공개적으로 높은 목표가를 제시해온 대표적 강세론자",
+        "as_of": "ARK 일일 공시·공개 리서치 기준 (2025년)"
+      },
+      {
+        "name": "론 배런",
+        "name_en": "Ron Baron",
+        "org": "Baron Capital",
+        "initials": "RB",
+        "stance": "bull",
+        "stance_label": "초장기 강세",
+        "stake": "2014년 전후 초기 투자 이후 장기 보유로 대규모 평가익을 공개 언급",
+        "view": "수년 단위 장기 보유 관점에서 테슬라의 성장 잠재력을 반복적으로 옹호",
+        "as_of": "공개 인터뷰·주주서한 기준 (2024년)"
+      }
+    ],
+    "MSFT": [
+      {
+        "name": "빌 게이츠",
+        "name_en": "Bill Gates",
+        "org": "게이츠 재단 신탁 (창업자)",
+        "initials": "BG",
+        "stance": "bull",
+        "stance_label": "창업자·재단 장기 보유",
+        "stake": "게이츠 재단 신탁의 최상위 보유 종목 중 하나",
+        "view": "창업자로서 AI 전환기 마이크로소프트의 위치에 대해 낙관적 견해를 공개적으로 유지",
+        "as_of": "재단 신탁 13F 공시 기준 (2024년)"
+      }
+    ],
+    "AMZN": [
+      {
+        "name": "제프 베이조스",
+        "name_en": "Jeff Bezos",
+        "org": "창업자·이사회 의장",
+        "initials": "JB",
+        "stance": "bull",
+        "stance_label": "창업자 대량 보유",
+        "stake": "약 9% 안팎의 지분 보유 (2024년 일부 매도 후에도 최대 개인주주)",
+        "view": "창업자로서 AWS·AI 투자 확대 방향을 공개적으로 지지",
+        "as_of": "SEC 공시 기준 (2024년)"
+      }
+    ],
+    "META": [
+      {
+        "name": "마크 저커버그",
+        "name_en": "Mark Zuckerberg",
+        "org": "창업자·CEO",
+        "initials": "MZ",
+        "stance": "bull",
+        "stance_label": "창업자 지배 지분",
+        "stake": "지분 약 13%에 차등의결권으로 의결권 과반 확보",
+        "view": "AI·메타버스 장기 투자를 주주서한에서 반복적으로 강조",
+        "as_of": "위임장 공시 기준 (2024년)"
+      }
+    ],
+    "005930.KS": [
+      {
+        "name": "국민연금공단",
+        "name_en": "National Pension Service",
+        "org": "국내 최대 기관투자자",
+        "initials": "NPS",
+        "stance": "neutral",
+        "stance_label": "최대 외부주주 (수탁 운용)",
+        "stake": "지분 약 7%대 (분기별 대량보유 공시에 따라 변동)",
+        "view": "장기 수탁 운용 원칙에 따라 보유하며, 주주총회 의결권 행사 내역을 공개",
+        "as_of": "DART 대량보유상황보고 기준 (2025년)"
+      }
+    ]
+  }
+}

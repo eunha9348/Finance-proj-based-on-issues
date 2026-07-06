@@ -5,7 +5,7 @@
 
 <div class="grid-2">
   <div class="card">
-    <h3>🧭 나의 투자 성향</h3>
+    <h3>나의 투자 성향</h3>
     {% if profile %}
       <p class="risk-badge {{ profile['risk_type'] }}">{{ risk_labels[profile['risk_type']] }}</p>
       <p class="muted">{{ risk_desc[profile['risk_type']] }}</p>
@@ -17,7 +17,7 @@
   </div>
 
   <div class="card">
-    <h3>💼 내 포트폴리오 ({{ holdings|length }}종목)</h3>
+    <h3>내 포트폴리오 ({{ holdings|length }}종목)</h3>
     {% if holdings %}
       <ul class="mini-list">
         {% for h in holdings[:5] %}
@@ -39,7 +39,7 @@
 </div>
 
 <div class="card">
-  <h3>🕐 최근 분석</h3>
+  <h3>최근 분석</h3>
   {% if recent %}
     <table class="table">
       <thead><tr><th>일시(UTC)</th><th>대상</th><th>뉴스</th><th>이슈</th><th>모드</th><th></th></tr></thead>
