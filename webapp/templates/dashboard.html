@@ -41,7 +41,8 @@
 <div class="card">
   <h3>최근 분석</h3>
   {% if recent %}
-    <table class="table">
+    <div class="table-scroll">
+<table class="table">
       <thead><tr><th>일시(UTC)</th><th>대상</th><th>뉴스</th><th>이슈</th><th>모드</th><th></th></tr></thead>
       <tbody>
       {% for a in recent %}
@@ -56,6 +57,7 @@
       {% endfor %}
       </tbody>
     </table>
+</div>
   {% else %}
     <p class="muted">아직 분석 이력이 없습니다. <a href="{{ url_for('main.analyze') }}">첫 분석을 시작해 보세요.</a></p>
   {% endif %}

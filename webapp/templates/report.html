@@ -20,6 +20,7 @@
 
 <div class="card reveal">
   <h3>5대 이슈 축 요약</h3>
+  <div class="table-scroll">
   <table class="table">
     <thead><tr><th>이슈 축</th><th>감지</th><th>평균 방향성</th><th>대표 뉴스</th></tr></thead>
     <tbody>
@@ -45,6 +46,7 @@
     {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 
 {% for impact in result.impacts %}
@@ -123,6 +125,7 @@
     {# ── 축별 기여 분해 ── #}
     <details class="tactics">
       <summary>점수 계산 근거 — 뉴스별 기여 분해</summary>
+      <div class="table-scroll">
       <table class="table axis-detail">
         <thead><tr><th>이슈 축</th><th>뉴스 (클릭 시 원문)</th><th>전이 경로</th><th>기여</th></tr></thead>
         <tbody>
@@ -141,6 +144,7 @@
         {% endfor %}
         </tbody>
       </table>
+      </div>
       <p class="muted small">기여 = 뉴스 방향성 × 심각도 × 관련도(직접 언급 100% / 섹터 상관계수 / 시장 베타).
          기간 점수에는 실측 20일 가격 모멘텀이 기간별 계수(단기 0.5 / 중기 0.25 / 장기 0.1)로 가산됩니다.</p>
     </details>

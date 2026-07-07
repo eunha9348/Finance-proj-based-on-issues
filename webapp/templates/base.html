@@ -22,15 +22,19 @@
     <a class="brand" href="{{ url_for('main.index') }}">
       <span class="brand-mark">Issue</span>Lens
     </a>
-    <nav class="nav">
+    <button id="nav-toggle" class="nav-toggle" type="button"
+            aria-label="메뉴 열기" aria-expanded="false" aria-controls="site-nav">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="site-nav">
       {% if g.user %}
+        <span class="nav-user">{{ g.user['name'] }}님</span>
         <a href="{{ url_for('main.dashboard') }}">대시보드</a>
         <a href="{{ url_for('main.analyze') }}">종목 분석</a>
         <a href="{{ url_for('main.portfolio') }}">포트폴리오</a>
         <a href="{{ url_for('main.history') }}">분석 이력</a>
         <a href="{{ url_for('main.about') }}">소개</a>
         <button id="theme-toggle" type="button">라이트 모드</button>
-        <span class="nav-user">{{ g.user['name'] }}님</span>
         <a class="btn btn-ghost small-btn" href="{{ url_for('auth.logout') }}">로그아웃</a>
       {% else %}
         <a href="{{ url_for('main.about') }}">소개</a>

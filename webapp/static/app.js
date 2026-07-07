@@ -29,6 +29,35 @@
       });
     }
 
+    /* ── 모바일 내비 햄버거 토글 ─────────────────────────── */
+    const navToggle = document.getElementById("nav-toggle");
+    const nav = document.getElementById("site-nav");
+    if (navToggle && nav) {
+      const setOpen = function (open) {
+        nav.classList.toggle("open", open);
+        navToggle.classList.toggle("active", open);
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      };
+      navToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setOpen(!nav.classList.contains("open"));
+      });
+      // 메뉴 안 링크 클릭 시 닫기 (테마 토글 버튼은 제외)
+      nav.addEventListener("click", function (e) {
+        if (e.target.closest("a")) setOpen(false);
+      });
+      // 바깥 클릭·리사이즈 시 닫기
+      document.addEventListener("click", function (e) {
+        if (nav.classList.contains("open") &&
+            !nav.contains(e.target) && !navToggle.contains(e.target)) {
+          setOpen(false);
+        }
+      });
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 720) setOpen(false);
+      });
+    }
+
     /* ── 2. 스크롤 진입 애니메이션 ──────────────────────── */
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const targets = document.querySelectorAll(".reveal");

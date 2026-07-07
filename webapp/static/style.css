@@ -115,6 +115,20 @@ h4 { margin: 20px 0 8px; font-size: 15.5px; }
 }
 #theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
 
+/* 햄버거 버튼 (모바일에서만 노출) */
+.nav-toggle {
+  display: none; width: 40px; height: 40px; padding: 9px 8px;
+  background: transparent; border: 1px solid var(--line); border-radius: 10px;
+  cursor: pointer; flex-direction: column; justify-content: space-between;
+}
+.nav-toggle span {
+  display: block; height: 2px; width: 100%; border-radius: 2px;
+  background: var(--ink); transition: transform .25s, opacity .2s;
+}
+.nav-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+.nav-toggle.active span:nth-child(2) { opacity: 0; }
+.nav-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
 /* ── 버튼 ── */
 .btn {
   display: inline-block; padding: 10px 20px; border-radius: 12px;
@@ -390,3 +404,59 @@ label.radio-row span { flex: 1; }
 
 .footer { border-top: 1px solid var(--hairline); margin-top: 56px; padding: 26px 0 44px; color: var(--muted); font-size: 13px; }
 .footer p { margin-bottom: 6px; }
+
+/* ══════════════════════════════════════════════════════════
+   모바일 반응형 (≤ 720px) — 내비 햄버거 + 표 가로 스크롤
+   ══════════════════════════════════════════════════════════ */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 720px) {
+  .container { padding: 0 16px; }
+  h2 { font-size: 23px; }
+  .card { padding: 20px; }
+
+  /* 내비: 햄버거 드로어 */
+  .nav-toggle { display: flex; }
+  .nav {
+    position: absolute; top: 60px; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 4px;
+    padding: 10px 16px 16px;
+    background: var(--card-2); /* 완전 불투명 서피스 — 뒤 콘텐츠 비침 방지 */
+    border-bottom: 1px solid var(--hairline);
+    box-shadow: 0 16px 32px rgba(0,0,0,.4);
+    max-height: calc(100vh - 60px); overflow-y: auto;
+    transform: translateY(-8px); opacity: 0; pointer-events: none;
+    transition: transform .22s ease, opacity .22s ease;
+  }
+  .nav.open { transform: none; opacity: 1; pointer-events: auto; }
+  .nav a { padding: 12px 6px; font-size: 16px; border-bottom: 1px solid var(--hairline); }
+  .nav a.btn { border-bottom: none; text-align: center; margin-top: 6px; }
+  .nav .nav-user { padding: 8px 6px; font-size: 14px; order: -1; }
+  #theme-toggle { align-self: flex-start; margin: 8px 0; }
+
+  /* 표: 세로로 쪼개지지 않도록 가로 스크롤 + 최소폭 */
+  .table { min-width: 460px; }
+  .table th, .table td { white-space: nowrap; }
+  /* 뉴스 제목 열은 줄바꿈 허용 (링크 텍스트가 길어서) */
+  .table td.small { white-space: normal; min-width: 150px; }
+
+  /* 히어로·타이포 축소 */
+  .hero { padding: 48px 0 24px; }
+  .hero h1 { font-size: 30px; }
+  .lead { font-size: 16px; }
+  .about-hero h1 { font-size: 28px; }
+  .rec-action { font-size: 19px; }
+
+  /* 축 게이지: 라벨 폭 축소 */
+  .axis-row { grid-template-columns: 96px 1fr 52px; gap: 8px; }
+  .axis-name { font-size: 12.5px; }
+
+  /* 투자자 카드: 아바타 위 세로 배치 */
+  .investor-card { grid-template-columns: 1fr; gap: 10px; }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 표는 항상 가로 스크롤 컨테이너로 감싸 넘침 방지 */
+@media (max-width: 720px) {
+  .table-scroll { margin: 0 -4px; padding: 0 4px; }
+}

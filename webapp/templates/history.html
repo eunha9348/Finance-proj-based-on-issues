@@ -4,7 +4,8 @@
 <h2>분석 이력</h2>
 <div class="card">
   {% if analyses %}
-    <table class="table">
+    <div class="table-scroll">
+<table class="table">
       <thead><tr><th>일시(UTC)</th><th>구분</th><th>대상</th><th>뉴스</th><th>이슈</th><th>모드</th><th></th></tr></thead>
       <tbody>
       {% for a in analyses %}
@@ -20,6 +21,7 @@
       {% endfor %}
       </tbody>
     </table>
+</div>
   {% else %}
     <p class="muted">분석 이력이 없습니다.</p>
   {% endif %}
