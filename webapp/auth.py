@@ -95,9 +95,16 @@ def login_required(view):
     return wrapped
 
 
-def _login_user(user_row):
+def _login_user(user_row, remember: bool = True):
+    """세션에 로그인 상태를 기록한다.
+
+    remember=True(기본): 영구 세션 — 브라우저를 닫아도 30일간 로그인 유지
+        (PERMANENT_SESSION_LIFETIME). remember=False: 브라우저 종료 시 만료.
+    소셜 로그인·회원가입은 항상 로그인 유지로 처리한다.
+    """
     session.clear()
     session["user_id"] = user_row["id"]
+    session.permanent = remember
 
 
 def _has_profile(user_id: int) -> bool:
@@ -151,11 +158,12 @@ def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+        remember = request.form.get("remember") is not None
         user = get_db().execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
         if user is None or user["password_hash"] is None or not check_password_hash(user["password_hash"], password):
             flash("이메일 또는 비밀번호가 올바르지 않습니다.")
         else:
-            _login_user(user)
+            _login_user(user, remember=remember)
             return _after_login_redirect(user["id"])
     return render_template("auth/login.html", providers=enabled_providers())
 
@@ -214,6 +222,7 @@ def social_callback():
             "client_secret": cfg["client_secret"],
             "redirect_uri": url_for("auth.social_callback", _external=True),
             "code": code,
+            "state": state,  # 네이버는 토큰 교환에도 state 필요 (그 외 제공자는 무시)
         })
         userinfo = _get_json(cfg["userinfo_url"], token["access_token"])
     except Exception:

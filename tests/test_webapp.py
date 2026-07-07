@@ -123,6 +123,103 @@ class WebAppTest(unittest.TestCase):
         resp = self.client.get("/auth/social/google", follow_redirects=True)
         self.assertIn("설정되지 않았습니다", resp.get_data(as_text=True))
 
+    # ── 로그인 유지 (영구 세션) ────────────────────────────
+    def test_remember_me_sets_persistent_cookie(self):
+        self.register_and_login()
+        self.client.get("/auth/logout")
+        resp = self.client.post("/auth/login", data={
+            "email": "tester@example.com", "password": "test12345", "remember": "on",
+        })
+        cookie = resp.headers.get("Set-Cookie", "")
+        self.assertTrue("Max-Age=" in cookie or "Expires=" in cookie)
+
+    def test_no_remember_is_session_cookie(self):
+        self.register_and_login()
+        self.client.get("/auth/logout")
+        resp = self.client.post("/auth/login", data={
+            "email": "tester@example.com", "password": "test12345",
+        })
+        cookie = resp.headers.get("Set-Cookie", "")
+        self.assertNotIn("Max-Age=", cookie)
+        self.assertNotIn("Expires=", cookie)
+
+    # ── 분석 시 이력 DB 기록 ───────────────────────────────
+    def _count_analyses(self):
+        import sqlite3
+        conn = sqlite3.connect(self.app.config["DATABASE"])
+        try:
+            return conn.execute("SELECT COUNT(*) FROM analyses").fetchone()[0]
+        finally:
+            conn.close()
+
+    def test_analysis_is_logged_to_db(self):
+        self.register_and_login()
+        self.complete_survey()
+        self.assertEqual(self._count_analyses(), 0)
+        self.client.post("/analyze", data={"query": "005930.KS"})
+        self.assertEqual(self._count_analyses(), 1)
+        self.client.post("/analyze", data={"query": "NVDA"})
+        self.assertEqual(self._count_analyses(), 2)
+        # 이력 페이지에 두 건 모두 노출
+        html = self.client.get("/history").get_data(as_text=True)
+        self.assertEqual(html.count("리포트 보기"), 2)
+
+    def test_analysis_history_belongs_to_user(self):
+        # 사용자 A가 분석 → A의 이력에만 남고 B에게는 안 보임
+        self.register_and_login()
+        self.complete_survey()
+        self.client.post("/analyze", data={"query": "TSLA"})
+        self.client.get("/auth/logout")
+        self.client.post("/auth/register", data={
+            "email": "b@example.com", "name": "비", "password": "test12345",
+        })
+        self.client.post("/survey/", data={f"q{i}": "2" for i in range(6)})
+        html = self.client.get("/history").get_data(as_text=True)
+        self.assertIn("분석 이력이 없습니다", html)
+
+    # ── 소셜 로그인 전체 흐름 (HTTP 모킹) ──────────────────
+    def test_social_login_full_flow_mocked(self):
+        import os
+        from webapp import auth
+        os.environ["GOOGLE_CLIENT_ID"] = "test-id"
+        os.environ["GOOGLE_CLIENT_SECRET"] = "test-secret"
+        orig_post, orig_get = auth._post_form, auth._get_json
+        auth._post_form = lambda url, data: {"access_token": "tok"}
+        auth._get_json = lambda url, bearer: {
+            "sub": "google-123", "email": "social@example.com", "name": "소셜유저",
+        }
+        try:
+            # 1) 시작: 구글 인가 URL로 리다이렉트
+            r = self.client.get("/auth/social/google")
+            self.assertEqual(r.status_code, 302)
+            self.assertIn("accounts.google.com", r.headers["Location"])
+            with self.client.session_transaction() as s:
+                state = s["oauth_state"]
+            # 2) 콜백: 신규 사용자 생성 + 로그인 + 설문으로 이동
+            r = self.client.get(f"/auth/social/callback?code=abc&state={state}",
+                                 follow_redirects=True)
+            body = r.get_data(as_text=True)
+            self.assertIn("투자 성향", body)  # 신규 → 설문
+            with self.client.session_transaction() as s:
+                self.assertIn("user_id", s)   # 로그인됨
+            # 3) 재로그인 시 기존 계정 재사용 (중복 생성 안 함)
+            self.client.get("/auth/logout")
+            with self.client.session_transaction() as s:
+                s["oauth_state"] = "st2"; s["oauth_provider"] = "google"
+            self.client.get("/auth/social/callback?code=abc&state=st2",
+                            follow_redirects=True)
+            import sqlite3
+            conn = sqlite3.connect(self.app.config["DATABASE"])
+            n = conn.execute(
+                "SELECT COUNT(*) FROM users WHERE email='social@example.com'"
+            ).fetchone()[0]
+            conn.close()
+            self.assertEqual(n, 1)
+        finally:
+            auth._post_form, auth._get_json = orig_post, orig_get
+            os.environ.pop("GOOGLE_CLIENT_ID", None)
+            os.environ.pop("GOOGLE_CLIENT_SECRET", None)
+
     def test_analysis_history_detail_access_control(self):
         self.register_and_login()
         self.complete_survey()

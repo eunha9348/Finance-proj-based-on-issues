@@ -23,7 +23,13 @@ FLASK_SECRET_KEY=$(python -c "import secrets;print(secrets.token_hex(32))") \
   소셜 로그인은 환경변수 설정 시 자동 활성화:
   `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET`,
   `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`
-  (콜백 URL: `/auth/social/callback`)
+  (콜백 URL: `https://<도메인>/auth/social/callback` — 각 제공자 콘솔에 등록).
+  운영 환경은 `RENDER`/`TRUST_PROXY=1` 감지 시 ProxyFix로 X-Forwarded 헤더를 신뢰해
+  `redirect_uri`를 https로 생성하고 세션 쿠키에 Secure 플래그를 붙입니다.
+- **로그인 유지**: '로그인 상태 유지' 선택 시 영구 세션(30일, `PERMANENT_SESSION_LIFETIME`).
+  브라우저를 닫아도 유지되며, 해제 시 브라우저 종료로 만료됩니다. 소셜 로그인·가입은 유지가 기본.
+- **분석 이력**: 로그인 사용자가 종목·포트폴리오를 분석하면 `analyses` 테이블에
+  리포트 전문과 함께 자동 저장되어 `분석 이력`에서 다시 열람할 수 있습니다(사용자별 격리).
 - **투자 성향 설문**: 가입 직후 6문항 진단 → 안정형/위험중립형/공격형.
   성향에 따라 매수·매도 임계값이 ±0.08 보정됩니다.
 - **종목 분석**: 한·미 증시 **전 종목** 시장별 자동완성 검색(빌드 시 거래소 공식

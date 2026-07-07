@@ -208,6 +208,13 @@ h4 { margin: 20px 0 8px; font-size: 15.5px; }
 .social.kakao { background: #fee500; border-color: #fee500; color: #191919; }
 .social.naver { background: #03c75a; border-color: #03c75a; color: #fff; }
 .social.disabled { opacity: .5; }
+.remember-row {
+  display: flex; flex-direction: row; align-items: center; gap: 9px;
+  font-weight: 500; color: var(--ink-2); font-size: 14px; cursor: pointer;
+}
+.remember-row input[type="checkbox"] {
+  width: 17px; height: 17px; margin: 0; accent-color: var(--accent); cursor: pointer;
+}
 
 /* ── 자동완성 ── */
 .ac-wrap { position: relative; }
