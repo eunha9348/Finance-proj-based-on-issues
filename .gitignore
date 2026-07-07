@@ -4,3 +4,10 @@ __pycache__/
 report.md
 my_portfolio.json
 instance/
+
+# 보안: API 키·비밀은 절대 커밋하지 않는다 (환경변수로만 주입)
+.env
+.env.*
+*.key
+secrets.json
+data/tickers_full.json

@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from stockrisk.models import (
@@ -25,6 +26,28 @@ from stockrisk.models import (
 )
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+
+
+def recency_weight(published: datetime | None, now: datetime | None = None) -> float:
+    """뉴스 최신성 가중치 — 주가는 뉴스 직후 급변하므로 최신 기사일수록
+    기여를 크게, 오래된 기사는 감쇠한다. 발행 시각 미상은 보수적으로 0.6.
+
+    ≤24시간 1.0 / ≤3일 0.85 / ≤7일 0.65 / ≤14일 0.45 / 이후 0.25
+    """
+    if published is None:
+        return 0.6
+    now = now or datetime.now(timezone.utc)
+    pub = published if published.tzinfo else published.replace(tzinfo=timezone.utc)
+    age_days = max(0.0, (now - pub).total_seconds() / 86400)
+    if age_days <= 1:
+        return 1.0
+    if age_days <= 3:
+        return 0.85
+    if age_days <= 7:
+        return 0.65
+    if age_days <= 14:
+        return 0.45
+    return 0.25
 
 
 class ImpactAnalyzer:
@@ -91,19 +114,23 @@ class ImpactAnalyzer:
         scored: list[tuple[float, ClassifiedIssue, str]] = []
 
         axis_evidence: dict = {a: [] for a in IssueAxis}
+        now = datetime.now(timezone.utc)
         for issue in issues:
             relevance, path = self._relevance(holding, issue)
             if relevance <= 0.0:
                 continue
-            # 이슈 1건의 기여 = 방향성 × 심각도 × 관련도
-            contribution = issue.sentiment * issue.severity * relevance
-            axis_acc[issue.axis].append((contribution, relevance))
+            # 이슈 1건의 기여 = 방향성 × 심각도 × 관련도 × 최신성
+            rec_w = recency_weight(issue.news.published, now)
+            contribution = issue.sentiment * issue.severity * relevance * rec_w
+            axis_acc[issue.axis].append((contribution, relevance * rec_w))
             scored.append((abs(contribution), issue, path))
             axis_evidence[issue.axis].append({
                 "title": issue.news.title,
                 "link": issue.news.link,
                 "contribution": round(contribution, 3),
                 "path": path,
+                "published": issue.news.published.isoformat() if issue.news.published else None,
+                "recency": rec_w,
             })
 
         # 축별 점수: 관련도 가중 평균 — 직접 언급 뉴스가 시장 전반 노이즈에

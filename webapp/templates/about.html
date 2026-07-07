@@ -1,52 +1,131 @@
 {% extends "base.html" %}
 {% block title %}서비스 소개 — IssueLens{% endblock %}
 {% block content %}
-<h2>IssueLens는 어떻게 동작하나요?</h2>
+<section class="about-hero reveal">
+  <h1>뉴스가 주가를 움직이기 전에,<br>그 신호를 먼저 읽습니다</h1>
+  <p>IssueLens는 시장을 흔드는 뉴스를 다섯 개의 축으로 나눠 읽고, 각 종목에 미치는 영향을
+     실측 데이터와 함께 점수로 환산합니다. 추정하지 않고, 근거를 숨기지 않습니다.</p>
+</section>
 
-<div class="card">
-  <h3>1. 다섯 개의 이슈 축</h3>
-  <p>시장을 움직이는 뉴스를 다섯 갈래로 나눠 스캔합니다.</p>
-  <table class="table">
-    <thead><tr><th>축</th><th>내용</th><th>예시</th></tr></thead>
-    <tbody>
-      <tr><td>① 국가별 정치</td><td>선거·규제·관세·제재</td><td>반도체 관세, 반독점 소송</td></tr>
-      <tr><td>② 전쟁·세계</td><td>전쟁·분쟁·팬데믹·재해</td><td>중동 공습, 휴전 협상</td></tr>
-      <tr><td>③ 기업 자체</td><td>오너리스크·실적·공매도</td><td>어닝쇼크, 대규모 수주</td></tr>
-      <tr><td>④ 투자심리</td><td>급등락·수급·공포지수</td><td>외국인 순매도, 패닉셀</td></tr>
-      <tr><td>⑤ 거시 금융</td><td>금리·물가·환율</td><td>연준 금리인하, 경기침체</td></tr>
-    </tbody>
-  </table>
-</div>
+<section style="margin-top:36px">
+  <h2 class="reveal">시장을 보는 다섯 개의 렌즈</h2>
+  <p class="muted reveal">하나의 사건이라도 성격에 따라 주가에 닿는 경로와 속도가 다릅니다.
+     IssueLens는 모든 뉴스를 아래 다섯 축으로 동시에 스캔해, 보고 싶은 뉴스만 보게 되는 편향을 구조적으로 줄입니다.</p>
+  <div class="axis-cards">
+    <div class="axis-tile reveal">
+      <div class="axis-em">AXIS 01</div>
+      <h4>국가별 정치</h4>
+      <p>선거·규제·관세·제재. 정책은 입법에서 시행까지 시차가 있어 중기에 가장 크게 반영됩니다.</p>
+    </div>
+    <div class="axis-tile reveal d1">
+      <div class="axis-em">AXIS 02</div>
+      <h4>전쟁·세계</h4>
+      <p>분쟁·팬데믹·재해·휴전. 충격은 즉각적이라 단기 변동성에 가장 크게 작용합니다.</p>
+    </div>
+    <div class="axis-tile reveal d2">
+      <div class="axis-em">AXIS 03</div>
+      <h4>기업 자체</h4>
+      <p>실적·오너리스크·공매도·수주·소송. 펀더멘털에 직결돼 중·장기 가치를 좌우합니다.</p>
+    </div>
+    <div class="axis-tile reveal d1">
+      <div class="axis-em">AXIS 04</div>
+      <h4>투자심리</h4>
+      <p>급등락·수급·공포지수·랠리. 심리는 단기 변동의 핵심, 장기로는 평균에 회귀합니다.</p>
+    </div>
+    <div class="axis-tile reveal d2">
+      <div class="axis-em">AXIS 05</div>
+      <h4>거시 금융</h4>
+      <p>금리·물가·환율·경기. 금리 사이클은 장기 밸류에이션을 지배합니다.</p>
+    </div>
+  </div>
+</section>
 
-<div class="card">
-  <h3>2. 점수는 이렇게 계산됩니다</h3>
-  <ol>
-    <li><b>이슈 분류</b> — 뉴스에서 축별 키워드를 찾아 심각도(0~1)와 방향성(-1~+1)을 산출</li>
-    <li><b>관련도 판정</b> — 종목 직접 언급(100%) → 같은 섹터(상관계수) → 시장 전반(베타) 순서로 전이</li>
-    <li><b>기여 합산</b> — 방향성 × 심각도 × 관련도를 축별로 평균, 뉴스 건수로 신뢰도 보정</li>
-    <li><b>기간 합성</b> — 단기는 심리·전쟁, 장기는 기업·금리에 가중해 3개 기간 점수 산출</li>
-    <li><b>모멘텀 가산</b> — 실측 20일 수익률을 기간별 계수(단기 0.5 / 중기 0.25 / 장기 0.1)로 가산 (가격 데이터가 있을 때만)</li>
-    <li><b>성향 보정</b> — 투자 성향 진단 결과에 따라 매수·매도 임계값을 ±0.08 이동</li>
-  </ol>
-</div>
+<section style="margin-top:44px">
+  <h2 class="reveal">점수는 이렇게 만들어집니다</h2>
+  <p class="muted reveal">모든 단계가 공개된 수식과 실측 데이터로 이루어집니다. 결과에는 언제나 근거 뉴스와 계산 과정이 붙습니다.</p>
+  <div class="step-list" style="margin-top:18px">
+    <div class="step-item reveal">
+      <div class="step-badge">1</div>
+      <div>
+        <h4>수집 — 최신순·정확도 우선</h4>
+        <p>한국·미국 시장 뉴스를 종목별(호재·악재 방향 균형)과 이슈별 질의로 병렬 수집합니다.
+           수집한 기사는 발행 시각 기준 <b>최신순으로 정렬</b>되어, 방금 뜬 뉴스가 먼저 반영됩니다.</p>
+      </div>
+    </div>
+    <div class="step-item reveal">
+      <div class="step-badge">2</div>
+      <div>
+        <h4>분류 — 5대 축, 심각도 × 방향성</h4>
+        <p>각 뉴스에서 축을 판별하고 심각도(0~1)와 방향성(악재 −1 ~ 호재 +1)을 산출합니다.
+           <code>GOOGLE_AI_API_KEY</code>가 설정되면 Google Gemini가, 없으면 내장 키워드 사전이 분류를 담당합니다.</p>
+      </div>
+    </div>
+    <div class="step-item reveal">
+      <div class="step-badge">3</div>
+      <div>
+        <h4>전이 — 직접·섹터·시장 3단계</h4>
+        <p>종목이 직접 언급되면 100%, 같은 섹터면 상관계수, 시장 전반이면 베타 비율로
+           영향을 전달합니다. 여기에 <b>최신성 가중</b>을 곱해 오래된 뉴스는 감쇠시킵니다.</p>
+      </div>
+    </div>
+    <div class="step-item reveal">
+      <div class="step-badge">4</div>
+      <div>
+        <h4>기간 합성 — 단기·중기·장기</h4>
+        <p>축마다 기간별 중요도가 달라, 단기는 심리·전쟁에, 장기는 기업·금리에 가중합니다.
+           가격 데이터가 있으면 <b>실측 20일 모멘텀</b>을 더해 뉴스와 실제 흐름을 함께 봅니다.</p>
+      </div>
+    </div>
+    <div class="step-item reveal">
+      <div class="step-badge">5</div>
+      <div>
+        <h4>판단 — 성향 맞춤 매수·매도</h4>
+        <p>기간별 점수를 임계값과 비교해 적극매수 · 매수 · 보유 · 비중축소 · 매도로 환산하고,
+           투자 성향(안정·중립·공격)에 따라 기준을 ±0.08 조정합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="card">
-  <h3>3. 추천 기준</h3>
-  <table class="table">
-    <thead><tr><th>기간 점수</th><th>판정</th></tr></thead>
-    <tbody>
-      <tr><td>+0.30 이상</td><td>적극 매수</td></tr>
-      <tr><td>+0.08 이상</td><td>매수</td></tr>
-      <tr><td>-0.12 초과</td><td>보유</td></tr>
-      <tr><td>-0.32 초과</td><td>비중 축소</td></tr>
-      <tr><td>그 이하</td><td>매도</td></tr>
-    </tbody>
-  </table>
-  <p class="muted">매수 문턱(+0.08)이 축소 문턱(-0.12)보다 낮은 비대칭 구조입니다 — 뉴스는 구조적으로 악재 기사가 많아, 대칭 기준으로는 매수 신호가 과소 생산되는 편향을 보정한 것입니다. 안정형은 기준이 0.08 엄격해지고, 공격형은 0.08 완화됩니다.</p>
-</div>
+<section style="margin-top:44px">
+  <h2 class="reveal">추천 기준</h2>
+  <div class="card reveal">
+    <table class="table">
+      <thead><tr><th>기간 점수</th><th>판정</th></tr></thead>
+      <tbody>
+        <tr><td>+0.30 이상</td><td class="pos">적극 매수</td></tr>
+        <tr><td>+0.08 이상</td><td class="pos">매수</td></tr>
+        <tr><td>−0.12 초과</td><td>보유</td></tr>
+        <tr><td>−0.32 초과</td><td class="neg">비중 축소</td></tr>
+        <tr><td>그 이하</td><td class="neg">매도</td></tr>
+      </tbody>
+    </table>
+    <p class="muted small" style="margin-top:10px">매수 문턱(+0.08)이 축소 문턱(−0.12)보다 낮은 비대칭 구조입니다 —
+       뉴스는 구조적으로 악재 기사가 많아, 대칭 기준으로는 매수 신호가 과소 생산되는 편향을 보정한 것입니다.</p>
+  </div>
+</section>
 
-<div class="card disclaimer">
-  IssueLens는 뉴스 텍스트 기반 규칙 분석 도구입니다. 가격·재무 데이터를 직접 반영하지 않으며,
-  출력은 투자 권유가 아닌 참고 자료입니다.
+<section style="margin-top:44px">
+  <h2 class="reveal">데이터 원칙</h2>
+  <div class="grid-3">
+    <div class="card reveal">
+      <h3>추정하지 않습니다</h3>
+      <p>가격·지분·투자자 견해는 실측 API와 공시·보도 기반 데이터만 표시합니다.
+         가져오지 못하면 추정치 대신 "없음"을 보여줍니다.</p>
+    </div>
+    <div class="card reveal d1">
+      <h3>근거를 숨기지 않습니다</h3>
+      <p>모든 점수에 기여한 뉴스와 계산 경로를 리포트에서 원문 링크와 함께 열람할 수 있습니다.</p>
+    </div>
+    <div class="card reveal d2">
+      <h3>시점을 명시합니다</h3>
+      <p>주가는 뉴스 직후 급변합니다. 리포트마다 분석 기준 시각과 수집된 최신 뉴스 시각을 표기합니다.</p>
+    </div>
+  </div>
+</section>
+
+<div class="card disclaimer" style="margin-top:32px">
+  IssueLens의 모든 분석·추천은 뉴스 기반 참고 자료이며 투자 권유가 아닙니다.
+  모든 투자 판단과 책임은 투자자 본인에게 있습니다.
 </div>
 {% endblock %}

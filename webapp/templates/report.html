@@ -6,8 +6,17 @@
   분석 뉴스 {{ result.news_count }}건 · 감지 이슈 {{ result.issues|length }}건 ·
   {% if result.offline %}<span class="tag warn">샘플 뉴스 모드</span>
   {% else %}<span class="tag ok">실시간 뉴스</span>{% endif %}
+  {% if result.classifier_name == 'gemini' %}<span class="tag ok">Gemini AI 분류</span>{% endif %}
   · <a href="{{ url_for('main.history_detail', analysis_id=analysis_id) }}">이력에 저장됨</a>
 </p>
+<div class="asof-bar">
+  <span><b>분석 기준 시각</b> {{ result.analyzed_at }}</span>
+  {% if result.latest_news_at %}
+    <span><b>수집 최신 뉴스</b> {{ result.latest_news_at[:16].replace('T', ' ') }}</span>
+  {% endif %}
+  <span class="asof-note">주가는 뉴스 직후 급변할 수 있어, 최신 기사일수록 점수 기여를 크게 반영합니다.
+    이 리포트는 위 기준 시각의 스냅샷입니다.</span>
+</div>
 
 <div class="card reveal">
   <h3>5대 이슈 축 요약</h3>

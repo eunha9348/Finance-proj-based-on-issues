@@ -168,5 +168,62 @@ class TestPrices(unittest.TestCase):
         self.assertIsNone(fetch_history("___INVALID___", timeout=2))
 
 
+class TestRecency(unittest.TestCase):
+    """최신성 가중: 최신 기사일수록 크게, 오래될수록 감쇠, 미상은 보수적."""
+
+    def test_decay(self):
+        from datetime import datetime, timedelta, timezone
+        from stockrisk.analysis.impact import recency_weight
+        now = datetime(2026, 7, 7, tzinfo=timezone.utc)
+        self.assertEqual(recency_weight(now, now), 1.0)
+        self.assertGreater(recency_weight(now - timedelta(days=3), now),
+                           recency_weight(now - timedelta(days=10), now))
+        self.assertEqual(recency_weight(None, now), 0.6)
+
+
+class TestLLMClassifierSafety(unittest.TestCase):
+    """LLM 분류기: 키 없으면 비활성, 응답 검증이 잘못된 값을 차단."""
+
+    def test_disabled_without_key(self):
+        import os
+        from stockrisk.analysis import llm_classifier as L
+        # 키가 없는 환경에서 비활성 (있으면 이 테스트는 스킵)
+        if os.environ.get("GOOGLE_AI_API_KEY") or os.environ.get("GEMINI_API_KEY"):
+            self.skipTest("API key present")
+        self.assertFalse(L.is_enabled())
+
+    def test_validation_rejects_bad_axis_and_clamps(self):
+        from stockrisk.analysis.llm_classifier import GeminiClassifier
+        rows = [{"index": 0, "classifications": [
+            {"axis": "NOT_AN_AXIS", "severity": 0.5, "sentiment": 0.1},
+            {"axis": "company", "severity": 2.0, "sentiment": -3.0},
+        ]}]
+        out = GeminiClassifier._validate(rows, 1)
+        self.assertEqual(len(out[0]), 1)                 # 잘못된 축 제거
+        self.assertEqual(out[0][0]["axis"], "company")
+        self.assertEqual(out[0][0]["severity"], 1.0)     # 범위 클램프
+        self.assertEqual(out[0][0]["sentiment"], -1.0)
+
+    def test_validation_rejects_out_of_range_index(self):
+        from stockrisk.analysis.llm_classifier import GeminiClassifier
+        out = GeminiClassifier._validate([{"index": 99, "classifications": []}], 1)
+        self.assertNotIn(99, out)
+
+
+class TestFullRegistry(unittest.TestCase):
+    """전 종목 검색: 폴백(큐레이션)에서도 랭킹·시장 분리가 동작."""
+
+    def test_search_ranks_exact_first(self):
+        from webapp.analysis_service import search_registry
+        results = search_registry("NVDA")
+        self.assertTrue(results)
+        self.assertEqual(results[0]["ticker"], "NVDA")
+
+    def test_search_partial_korean(self):
+        from webapp.analysis_service import search_registry
+        tickers = [t["ticker"] for t in search_registry("삼성")]
+        self.assertIn("005930.KS", tickers)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -5,7 +5,8 @@ services:
     name: issuelens
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    # 빌드 시 거래소 공식 종목 목록을 생성한다 (실패해도 배포는 계속 — 앱은 큐레이션 목록으로 폴백)
+    buildCommand: pip install -r requirements.txt && (python scripts/build_ticker_db.py || echo "ticker DB build skipped")
     startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT "webapp:create_app()"
     healthCheckPath: /
     envVars:
@@ -15,6 +16,10 @@ services:
         value: /opt/render/project/src/instance/app.db
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # Google AI(Gemini) 뉴스 분류를 켜려면 대시보드에서 값을 채워 넣으세요 (선택).
+      # 비워두면 내장 키워드 분류기로 동작합니다. 이 값은 절대 코드/저장소에 넣지 마세요.
+      - key: GOOGLE_AI_API_KEY
+        sync: false
       # 소셜 로그인을 쓰려면 Render 대시보드에서 아래 값을 직접 채워 넣으세요 (선택)
       - key: GOOGLE_CLIENT_ID
         sync: false
