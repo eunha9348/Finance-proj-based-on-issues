@@ -66,6 +66,11 @@ body {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   transition: background .3s, color .3s;
+  /* 한글(CJK) 단어가 줄 끝에서 글자 단위로 쪼개지지 않도록 —
+     공백에서만 줄바꿈하고, 한 단어가 줄보다 길 때만 예외적으로 끊는다.
+     (예: '매수'가 '매'/'수'로 분리되던 문제 해결) */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .container { max-width: 1040px; margin: 0 auto; padding: 0 22px; }
