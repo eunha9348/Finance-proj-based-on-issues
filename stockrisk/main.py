@@ -21,6 +21,10 @@ from pathlib import Path
 
 from stockrisk.analysis.classifier import IssueClassifier
 from stockrisk.analysis.impact import ImpactAnalyzer
+from stockrisk.crowd.backtest import run_backtest
+from stockrisk.crowd.data import load_monthly_records, refresh_snapshots
+from stockrisk.crowd.index import compute_crowd_index
+from stockrisk.crowd.report import build_crowd_report
 from stockrisk.models import Holding, Market, Portfolio
 from stockrisk.news.collector import NewsCollector, load_news_from_file
 from stockrisk.report import build_report
@@ -80,6 +84,24 @@ def run_analysis(args: argparse.Namespace) -> str:
     return report
 
 
+def run_crowd_backtest(args: argparse.Namespace) -> str:
+    if args.refresh:
+        print("[군중심리] 원 출처에서 최신 데이터 다운로드 중...", file=sys.stderr)
+        refresh_snapshots()
+
+    records = load_monthly_records()
+    index_points = compute_crowd_index(records)
+    backtest = run_backtest(records, index_points)
+    report = build_crowd_report(records, index_points, backtest)
+
+    if args.output:
+        Path(args.output).write_text(report, encoding="utf-8")
+        print(f"[완료] 리포트 저장: {args.output}", file=sys.stderr)
+    else:
+        print(report)
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="stockrisk",
@@ -100,10 +122,22 @@ def main(argv: list[str] | None = None) -> int:
     p_monitor.add_argument("--per-query-limit", type=int, default=10)
     p_monitor.add_argument("--news-file", default=None, help=argparse.SUPPRESS)
 
+    p_crowd = sub.add_parser(
+        "crowd-backtest", help="군중심리지수 산출 + S&P500 매수·보유 대비 백테스트 리포트 생성"
+    )
+    p_crowd.add_argument("--output", help="리포트 저장 경로 (미지정 시 표준 출력)")
+    p_crowd.add_argument(
+        "--refresh", action="store_true", help="data/market/ 스냅샷을 원 출처에서 갱신 후 실행"
+    )
+
     args = parser.parse_args(argv)
 
     if args.command == "analyze":
         run_analysis(args)
+        return 0
+
+    if args.command == "crowd-backtest":
+        run_crowd_backtest(args)
         return 0
 
     if args.command == "monitor":

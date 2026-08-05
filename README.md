@@ -191,6 +191,28 @@ python -m stockrisk monitor --portfolio my_portfolio.json --interval 1800
 단기에 가장 크게(1.0), 장기에는 거의(0.2) 반영되지 않고, **거시 금융**은 장기에
 가장 크게(1.0) 반영됩니다.
 
+## 🌊 군중심리지수(Crowd Pulse Index) — S&P500 백테스트
+
+월가 기관 지표(공매도 잔고, 풋/콜 비율 등) 대신, **가격이 흘러온 자취**(모멘텀·
+이동평균 이격도·VIX·CAPE 밸류에이션)로 CNN Fear & Greed 스타일의 0~100 지수를
+만들고, 이 지수로 주식 비중을 정하는 역발상(contrarian) 전략을 S&P500 매수·보유와
+비교 백테스트한다.
+
+```bash
+# 커밋된 실측 데이터 스냅샷으로 즉시 실행 (네트워크 불필요)
+python -m stockrisk crowd-backtest --output reports/crowd_pulse_backtest.md
+
+# data/market/ 스냅샷을 원 출처에서 최신화 후 실행
+python -m stockrisk crowd-backtest --refresh --output reports/crowd_pulse_backtest.md
+```
+
+- **데이터**: VIX 일별 종가(CBOE, 1990~) + Shiller 교수의 S&P500 월별 명목가격·
+  배당·CAPE(PE10)(1871~). 둘 다 무료 공개 데이터의 실측 스냅샷이며 `data/market/`에
+  커밋되어 있다 — 추정·생성값이 아니다.
+- **결과**: `reports/crowd_pulse_backtest.md`에 방법론, 지수 추이 차트, 성과 비교
+  표, 주요 하락장 방어력 분석이 담긴다. 자세한 코드는
+  [`stockrisk/crowd/`](stockrisk/crowd/) 참고.
+
 ## 테스트
 
 ```bash
@@ -205,6 +227,7 @@ stockrisk/
 ├── news/collector.py       # Google News RSS 수집기 (+오프라인 모드)
 ├── analysis/classifier.py  # 5대 축 키워드 분류기
 ├── analysis/impact.py      # 보유·연관 종목 영향 분석
+├── crowd/                  # 군중심리지수 산출 + S&P500 백테스트 (data/index/backtest/charts/report)
 ├── strategy/recommender.py # 기간별 전략·매수/매도 추천
 ├── report.py               # 마크다운 리포트 생성
 └── main.py                 # CLI (analyze / monitor)
